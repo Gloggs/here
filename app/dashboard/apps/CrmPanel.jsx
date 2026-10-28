@@ -15,6 +15,10 @@ export default function CrmPanel({ crm, current = true, onChange }) {
     crm.actions().then(setActions).catch((e) => { setActions([]); toast.error(e.message); });
   }, [crm, current]);
   useEffect(() => { loadActions(); }, [loadActions]);
+  // Arriving from "Check-ins to approve" elsewhere: scroll to the list once it has loaded.
+  useEffect(() => {
+    if (actions !== null && window.location.hash === "#checkins") document.getElementById("checkins")?.scrollIntoView({ block: "start" });
+  }, [actions]);
 
   async function updateAll() {
     setBusy("fields");
@@ -44,7 +48,7 @@ export default function CrmPanel({ crm, current = true, onChange }) {
             <p className="r-muted r-small">Update fields fills in three fields on each linked Contact. Add them once in Zoho, under Setup, Modules and Fields, Contacts, using the labels <b>Here Attendance</b> (number), <b>Here Status</b> (single line) and <b>Here Last Marked</b> (date).</p>
           ) : null}
 
-          <h3 className="r-zoho-title" style={{ marginTop: 20 }}>Suggested check-ins</h3>
+          <h3 id="checkins" className="r-zoho-title" style={{ marginTop: 20, scrollMarginTop: 24 }}>Suggested check-ins</h3>
           {actions === null ? <Loading rows={1} /> : actions.length === 0 ? (
             <p className="r-muted r-small" style={{ marginTop: 0 }}>Nobody needs one right now. Students appear here after three absences in a row, or when attendance falls below 90%. Nothing is created in {crm.name} until you approve it.</p>
           ) : (
@@ -65,18 +69,18 @@ export default function CrmPanel({ crm, current = true, onChange }) {
   );
 }
 
-function ImportDialog({ crm, onClose, onDone }) {
+export function ImportDialog({ crm, onClose, onDone, fixedClass }) {
   const [list, setList] = useState(null);
   const [page, setPage] = useState(1);
   const [more, setMore] = useState(false);
   const [classes, setClasses] = useState([]);
   const [tag, setTag] = useState("");
   const [picked, setPicked] = useState(() => new Set());
-  const [className, setClassName] = useState("");
+  const [className, setClassName] = useState(fixedClass || "");
   const [busy, setBusy] = useState(false);
 
   const fetchPage = useCallback((p) => crm.browse(p).then((r) => { setList((l) => [...(l || []), ...r.contacts]); setMore(r.more); setPage(p); }).catch((e) => { setList((l) => l || []); toast.error(e.message); }), [crm]);
-  useEffect(() => { fetchPage(1); api.get("/api/classes").then((c) => { setClasses(c); setClassName(c[0]?.name || ""); }).catch(() => {}); }, [fetchPage, crm]);
+  useEffect(() => { fetchPage(1); api.get("/api/classes").then((c) => { setClasses(c); if (!fixedClass) setClassName(c[0]?.name || ""); }).catch(() => {}); }, [fetchPage, crm, fixedClass]);
 
   const tags = [...new Set((list || []).flatMap((c) => c.tags))].sort();
   const shown = (list || []).filter((c) => !tag || c.tags.includes(tag));
@@ -99,9 +103,11 @@ function ImportDialog({ crm, onClose, onDone }) {
           <p className="r-muted r-small" style={{ margin: 0 }}>Choose the contacts who are your students. Each becomes a student in the class you pick, already linked to their contact. {crm.kind === "zoho" ? "Showing your newest 100 Contacts at a time." : "These are made-up people."}</p>
           {classes.length === 0 ? <p className="r-error">Create a class first, then come back to import.</p> : (
             <div className="r-row" style={{ gap: 8 }}>
-              <select className="r-select r-grow" value={className} onChange={(e) => setClassName(e.target.value)} aria-label="Add to class">
-                {classes.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
-              </select>
+              {fixedClass ? <span className="r-grow">Adding to <b>{fixedClass}</b></span> : (
+                <select className="r-select r-grow" value={className} onChange={(e) => setClassName(e.target.value)} aria-label="Add to class">
+                  {classes.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+                </select>
+              )}
               {tags.length ? (
                 <select className="r-select r-grow" value={tag} onChange={(e) => setTag(e.target.value)} aria-label="Filter by tag">
                   <option value="">All tags</option>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
-import { zohoAdapter, demoAdapter } from "@/lib/crm-client";
+import { zohoAdapter, demoAdapter, forgetCrmStatus } from "@/lib/crm-client";
 import { PageHead, Panel, Loading, ConfirmButton, useAccount } from "../ui";
 import CrmPanel from "./CrmPanel";
 import SampleCrm from "./SampleCrm";
@@ -62,7 +62,7 @@ function Apps() {
                         {zoho.scopeVersion < 2 ? <a className="r-btn" href="/api/connect/zoho">Update permissions</a> : null}
                         <ConfirmButton className="r-btn r-btn-ghost" label="Disconnect" title="Disconnect Zoho CRM?" confirmLabel="Disconnect"
                           message="Here. will cancel its access with Zoho and forget which students are linked to which Contacts. Nothing in Zoho is deleted."
-                          onConfirm={async () => { try { await api.del("/api/connections?provider=zoho"); toast.success("Zoho CRM disconnected."); load(); } catch (e) { toast.error(e.message); } }} />
+                          onConfirm={async () => { try { await api.del("/api/connections?provider=zoho"); forgetCrmStatus(); toast.success("Zoho CRM disconnected."); load(); } catch (e) { toast.error(e.message); } }} />
                       </div>
                       <CrmPanel crm={zohoCrm} current={zoho.scopeVersion >= 2} />
                     </>

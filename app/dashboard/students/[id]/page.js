@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, qs, shortDate, pct, flag } from "@/lib/client";
 import { PageHead, Panel, Bar, Dialog, Loading, ConfirmButton, Avatar, useAccount } from "../../ui";
-import ContactPanel from "./ContactPanel";
+import ContactPanel, { StudentCrm } from "./ContactPanel";
 import PhotoEditor from "../../PhotoEditor";
 import { Pencil } from "lucide-react";
 import StudentForm from "../StudentForm";
@@ -60,6 +60,8 @@ export default function StudentProfile({ params }) {
           <div className="r-stat"><div className="r-stat-num">{summary.unexplained}</div><div className="r-stat-label">No reason given</div></div>
         </div>
 
+        <StudentCrm student={student} sandbox={sandbox} />
+
         <div className="r-grid2">
           <Panel title="By day of the week">
             <ul className="r-list">
@@ -98,7 +100,7 @@ export default function StudentProfile({ params }) {
           )}
         </Panel>
 
-        <ContactPanel student={student} recent={recent} sandbox={sandbox} />
+        <ContactPanel student={student} recent={recent} />
 
         <div className="r-row">
           <Link className="r-btn r-btn-ghost" href="/dashboard/students">Back to students</Link>

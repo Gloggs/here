@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Search } from "lucide-react";
 import { SideNav, BottomNav } from "./Nav";
 import { OfflineBar, SandboxBar } from "./ui";
 import { Workspace, SpaceTabs } from "./Workspace";
+import { TopbarSearch } from "./Command";
 import Logo from "../_brand/Logo";
 import { getUserId } from "@/lib/auth";
 import { SPACE_COOKIE } from "@/lib/guest";
@@ -37,7 +37,7 @@ export default async function DashboardLayout({ children }) {
           <div className="r-topbar">
             <Link href="/dashboard" aria-label="Here. today"><Logo onDark height={28} /></Link>
             <SpaceTabs compact />
-            <Link href="/dashboard/students" className="r-icon-btn r-topbar-btn" aria-label="Find a student"><Search size={18} aria-hidden="true" /></Link>
+            <TopbarSearch />
           </div>
           <SandboxBar />
           <div id="main" tabIndex={-1}>{children}</div>

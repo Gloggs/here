@@ -1,13 +1,19 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { api } from "@/lib/client";
-import { PageHead, Dialog, Loading, AddStudentsForm, StudentRow } from "../ui";
+import { PageHead, Dialog, Loading, AddStudentsForm, StudentRow, useAccount } from "../ui";
+import { openImport } from "../Command";
 import StudentForm from "./StudentForm";
 
-export default function Students() {
+function Students() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const { sandbox } = useAccount();
+  const crmName = sandbox ? "the sample CRM" : "Zoho";
   const [classes, setClasses] = useState(null);
   const [students, setStudents] = useState([]);
   const [filter, setFilter] = useState("");
@@ -22,6 +28,9 @@ export default function Students() {
     } catch (e) { setError(e.message); }
   }
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (params.get("add")) { setAdding("many"); router.replace("/dashboard/students", { scroll: false }); }
+  }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const shown = useMemo(() => students.filter((s) =>
     (!filter || s.className === filter) && (!search || s.name.toLowerCase().includes(search.trim().toLowerCase()))), [students, filter, search]);
@@ -32,7 +41,10 @@ export default function Students() {
   return (
     <>
       <PageHead back={{ href: "/dashboard/more", label: "More", phoneOnly: true }} title="Students" sub={`${students.length} ${students.length === 1 ? "student" : "students"} in ${classes.length} ${classes.length === 1 ? "class" : "classes"}`}>
-        {classes.length ? <button className="r-btn r-btn-light" onClick={() => setAdding("many")}><Plus size={18} aria-hidden="true" /> Add students</button> : null}
+        {classes.length ? <>
+          <button className="r-btn r-btn-ghost" onClick={() => openImport()}><Upload size={18} aria-hidden="true" /> Import from {sandbox ? "sample CRM" : "Zoho"}</button>
+          <button className="r-btn r-btn-light" onClick={() => setAdding("many")}><Plus size={18} aria-hidden="true" /> Add students</button>
+        </> : null}
       </PageHead>
       <div className="r-body">
         {!classes.length ? (
@@ -63,10 +75,15 @@ export default function Students() {
       <Dialog open={adding === "many"} onClose={() => setAdding(null)} title="Add students">
         <AddStudentsForm classes={classes} autoFocus onDone={(r) => { toast.success(`Added ${r.added} ${r.added === 1 ? "student" : "students"}.`); setAdding(null); load(); }} />
         <p className="r-muted r-small" style={{ marginBottom: 0 }}>Need a contact number or address? <button className="r-linkbtn" onClick={() => setAdding("one")}>Add one student with details</button></p>
+        <p className="r-muted r-small" style={{ marginBottom: 0 }}>Already in {crmName}? <button className="r-linkbtn" onClick={() => { setAdding(null); openImport(); }}>Import them instead</button>, already linked to their contacts.</p>
       </Dialog>
       <Dialog open={adding === "one"} onClose={() => setAdding(null)} title="Add a student">
         <StudentForm classes={classes} submitLabel="Add student" onSubmit={async (v) => { await api.post("/api/student", v); toast.success(`${v.name} added.`); setAdding(null); load(); }} />
       </Dialog>
     </>
   );
+}
+
+export default function StudentsPage() {
+  return <Suspense fallback={<Loading />}><Students /></Suspense>;
 }

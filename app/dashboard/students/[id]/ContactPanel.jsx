@@ -9,7 +9,7 @@ import { absenceMessage, whatsappNumber } from "@/lib/notes";
 import { Panel } from "../../ui";
 
 /** Message a parent about an absence, and send attendance to a linked CRM contact (Zoho, or the sample CRM in the sandbox). */
-export default function ContactPanel({ student, recent, sandbox }) {
+export default function ContactPanel({ student, recent }) {
   const lastAbsent = recent.find((m) => m.status === "absent");
   const text = lastAbsent ? absenceMessage(student.name, student.className, longDate(lastAbsent.iso)) : null;
   const wa = whatsappNumber(student.contact);
@@ -25,13 +25,17 @@ export default function ContactPanel({ student, recent, sandbox }) {
           </div>
         </>
       ) : <p className="r-muted" style={{ margin: 0 }}>No absences to ask about.</p>}
-      <CrmLink student={student} sandbox={sandbox} />
     </Panel>
   );
 }
 
-function CrmLink({ student, sandbox }) {
+/** The student's CRM link, near the top of their profile so it is easy to find. */
+export function StudentCrm({ student, sandbox }) {
   const crm = useMemo(() => (sandbox ? demoAdapter() : zohoAdapter()), [sandbox]);
+  return <Panel title={crm.name} pad><CrmLink student={student} sandbox={sandbox} crm={crm} /></Panel>;
+}
+
+function CrmLink({ student, sandbox, crm }) {
   const [state, setState] = useState(null);
   const [q, setQ] = useState("");
   const [results, setResults] = useState(null);
@@ -39,7 +43,7 @@ function CrmLink({ student, sandbox }) {
 
   useEffect(() => { crm.getLink(student.id).then(setState).catch(() => setState({ connected: false })); }, [crm, student.id]);
   if (!state) return null;
-  if (!state.connected) return <p className="r-muted r-small" style={{ margin: "16px 0 0" }}>Use Zoho CRM? <Link href="/dashboard/apps">Connect it on the Apps page</Link> to send attendance to a Contact.</p>;
+  if (!state.connected) return <p className="r-muted" style={{ margin: 0 }}>Keep your students in Zoho? <Link href="/dashboard/apps">Connect Zoho CRM</Link> to link {student.name.split(" ")[0]} to their Contact and send attendance back with one tap.</p>;
 
   async function run(fn) { setBusy(true); try { await fn(); } catch (err) { toast.error(err.message); } finally { setBusy(false); } }
   const search = (e) => { e.preventDefault(); run(async () => setResults(await crm.search(q))); };
@@ -48,8 +52,7 @@ function CrmLink({ student, sandbox }) {
   const fields = () => run(async () => { await crm.updateFields(student.id); toast.success(`Attendance fields updated in ${crm.name}.`); });
 
   return (
-    <div className="r-zoho">
-      <h3 className="r-zoho-title">{crm.name}</h3>
+    <div>
       {state.link ? (
         <>
           <div className="r-row">
@@ -58,10 +61,12 @@ function CrmLink({ student, sandbox }) {
             <button className="r-btn r-btn-ghost" onClick={fields} disabled={busy}>Update fields</button>
             <button className="r-btn r-btn-ghost" onClick={() => link(null)} disabled={busy}>Unlink</button>
           </div>
+          <p className="r-muted r-small" style={{ marginBottom: 0 }}>Send a note adds an attendance summary to the contact. Update fields fills in attendance %, status and last marked.</p>
           {sandbox ? <p className="r-muted r-small" style={{ marginBottom: 0 }}>This is the built-in sample CRM, so nothing leaves your browser. See what arrived on the <Link href="/dashboard/apps">Apps page</Link>.</p> : null}
         </>
       ) : (
         <>
+          <p className="r-muted" style={{ marginTop: 0 }}>Not linked yet. Find {student.name.split(" ")[0]}&apos;s contact to send attendance to it.</p>
           <form className="r-row" onSubmit={search} style={{ gap: 8 }}>
             <input className="r-input r-grow" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find the contact by name, email or phone" aria-label={`Find a contact in ${crm.name}`} minLength={2} maxLength={60} />
             <button className="r-btn" disabled={busy || q.trim().length < 2}>Search</button>

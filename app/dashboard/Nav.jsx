@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, LayoutGrid, Users, FileText, Settings, Menu, Blocks } from "lucide-react";
+import { Sun, LayoutGrid, Users, FileText, Settings, Menu, Blocks, Music } from "lucide-react";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
-import { StudentSearch, useAccount } from "./ui";
+import { useAccount } from "./ui";
+import { CommandButton } from "./Command";
+import { openMedia } from "./MediaDock";
 import { SpaceTabs } from "./Workspace";
 import Logo from "../_brand/Logo";
 
@@ -27,12 +29,13 @@ export function SideNav() {
     <nav className="r-side" aria-label="Main">
       <Link href="/dashboard" className="r-brand" aria-label="Here. today"><Logo onDark height={36} /></Link>
       <div className="r-side-space"><SpaceTabs /></div>
-      <div className="r-side-search"><StudentSearch dark /></div>
+      <div className="r-side-search"><CommandButton dark /></div>
       {ITEMS.map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href} aria-current={isCurrent(path, href) ? "page" : undefined}>
           <Icon size={18} aria-hidden="true" /> {label}
         </Link>
       ))}
+      <button type="button" className="r-side-item" onClick={openMedia}><Music size={18} aria-hidden="true" /> Music</button>
       <div className="r-side-foot">
         <p className="r-side-user">{guest ? "Demo, no account" : name || user?.email || "Signed in"}</p>
         <div className="r-row" style={{ gap: 16 }}>
