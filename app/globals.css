@@ -602,7 +602,8 @@ html:has(.r-space.is-leave-left), html:has(.r-space.is-leave-right), html:has(.r
 .r-tools .r-btn { flex-shrink: 0; min-width: 84px; }
 .r-zoho { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
 .r-zoho-title { margin: 0 0 10px; font-size: 14px; }
-.r-media { width: 100%; border: 1px solid var(--line-strong); background: #262220; }
+.r-media { width: 100%; }
+.r-media.is-video { background: #262220; }
 .r-media.is-video { aspect-ratio: 16 / 9; }
 .r-media iframe { width: 100%; height: 100%; border: 0; display: block; }
 .r-seg-tools { grid-template-columns: repeat(4, 1fr); }
