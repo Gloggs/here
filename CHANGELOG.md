@@ -3,6 +3,10 @@
 ## 2.1 (October 2026)
 
 - Apps page: connect your own Zoho CRM, link students to Contacts and send attendance notes.
+- Import students from Zoho Contacts into a class, filtered by tag, already linked.
+- Update attendance fields on Contacts (percentage, status, last marked) so Zoho can report on them.
+- Suggested check-ins: after three absences in a row or attendance below 90%, Here. proposes a Zoho Task. Nothing is created until you approve it.
+- A built-in sample CRM in the sandbox and the demo, so all of this can be tried without connecting anything.
 - Message a parent about an absence on WhatsApp or by email, from the student's profile.
 - YouTube and Spotify player in a class's Tools.
 - Choose the name the app shows for you.

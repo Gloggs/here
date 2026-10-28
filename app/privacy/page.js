@@ -35,7 +35,7 @@ export default function Privacy() {
       <h2>Connected apps</h2>
       <p>Apps are off until you connect them from the Apps page. Connecting sends you to that company to approve access. Here. never sees your password for it.</p>
       <ul>
-        <li><b>Zoho CRM.</b> Here. can read your Contacts so you can link a student to one, and it adds a note to that Contact only when you press Send. It cannot see deals, emails or other records.</li>
+        <li><b>Zoho CRM.</b> Here. can read your Contacts, so you can link a student to one or import students from them. When you press a button it can add a note, update three attendance fields, or create a check-in Task on a Contact. It cannot see deals, emails or other records, and it writes nothing to Zoho until you press the button or approve the Task.</li>
         <li><b>WhatsApp and email.</b> The Message buttons open your own WhatsApp or email app with a note filled in. Nothing is sent until you send it there, and Here. does not connect to either service.</li>
         <li><b>YouTube and Spotify.</b> Videos and playlists you open in the Toolkit play from those sites, which apply their own privacy terms. YouTube is loaded in its privacy-enhanced mode.</li>
       </ul>
