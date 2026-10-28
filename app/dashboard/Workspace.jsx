@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
+import MediaDock from "./MediaDock";
 
 // Two spaces, like two desktops: the real register and a sandbox full of practice data.
 // The server keeps them apart (each is its own owner id); this file makes switching
@@ -83,6 +84,7 @@ export function Workspace({ space, guest, name, children }) {
   return (
     <SpaceContext.Provider value={{ space, guest, name, switchTo, refresh, switching }}>
       <div className={`r-space ${motion}`} data-space={space} key={generation}>{children}</div>
+      <MediaDock />
     </SpaceContext.Provider>
   );
 }
