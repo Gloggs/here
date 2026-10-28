@@ -80,3 +80,7 @@ The app uses the marks from paper registers in English schools: `/` present, `L`
 - UK spelling.
 - Short sentences and everyday words. Buttons say what happens: "Mark the other 10 present", "Download summary (CSV)".
 - No long dashes, no exclamation marks, no buzzwords such as seamless, effortless or powerful.
+
+## Things the design avoids on purpose
+
+These are the marks of templated interfaces, so none of them appear: coloured accent lines under headings or numbers, thick coloured left or top borders on cards, count badges beside headings, underline bars on active tabs and navigation, pill buttons, gradients, shadows and fading hovers. The active page is shown by weight and a filled background instead.
