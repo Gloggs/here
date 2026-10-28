@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getOwnerId } from "@/lib/auth";
-import { canConnect, saveConnection } from "@/lib/connections";
+import { canConnect, readSettings, saveConnection } from "@/lib/connections";
 import { checkState, STATE_COOKIE } from "@/lib/oauth-state";
-import { exchangeCode, orgName, validAccountsServer } from "@/lib/providers/zoho";
+import { exchangeCode, orgName, SCOPE_VERSION, validAccountsServer } from "@/lib/providers/zoho";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,9 @@ export async function GET(request) {
   if (!code || !validAccountsServer(accounts)) return back("error=failed");
   try {
     const t = await exchangeCode(code, accounts);
-    await saveConnection(ownerId, "zoho", t, await orgName(t), { accounts, links: {} });
+    // Reconnecting to approve new permissions must not lose which students are linked to which Contacts.
+    const before = await readSettings(ownerId, "zoho");
+    await saveConnection(ownerId, "zoho", t, await orgName(t), { accounts, links: before.links || {}, tasked: before.tasked || {}, scopeVersion: SCOPE_VERSION });
     return back("connected=zoho");
   } catch (error) {
     console.error("[zoho callback]", error.message);

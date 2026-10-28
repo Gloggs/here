@@ -60,7 +60,7 @@ Neon Postgres (Drizzle ORM)
 
 ## Main API routes
 
-Connected apps: `/api/connect/zoho` starts the Zoho sign-in, `/api/connect/zoho/callback` finishes it, `/api/connections` lists or disconnects apps, and `/api/zoho/contacts`, `/api/zoho/link` and `/api/zoho/note` search Contacts, link a student and send a note. Keys are handled in `lib/connections.js` and `lib/crypto.js`.
+Connected apps: `/api/connect/zoho` starts the Zoho sign-in, `/api/connect/zoho/callback` finishes it, `/api/connections` lists or disconnects apps, and `/api/zoho/contacts`, `/api/zoho/link`, `/api/zoho/note`, `/api/zoho/import`, `/api/zoho/fields` and `/api/zoho/actions` search Contacts, link a student, send a note, import students, update fields and create approved Tasks. `lib/crm.js` holds the pure rules (risk, fields, tasks, import tidying), `lib/crm-data.js` builds what is sent from stored marks, and `lib/crm-client.js` gives the pages one interface over Zoho and the sample CRM (`/api/crm/*`, sandbox and demo only; its memory stays in the browser). Keys are handled in `lib/connections.js` and `lib/crypto.js`.
 
 | Route | Methods | Purpose |
 | --- | --- | --- |

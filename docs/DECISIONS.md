@@ -72,3 +72,11 @@ Short records of the choices that shaped the app, and why.
 **Choice:** Each user connects their own Zoho through OAuth. The keys Zoho returns are encrypted with AES-256-GCM and stored against that account's id only. The browser never sees them, the connect step is protected by a signed one-time state, and disconnecting cancels access with Zoho. Only three narrow scopes are requested: read Contacts, create notes and read the organisation name. WhatsApp, email, YouTube and Spotify need no connection at all, so they carry no stored keys.
 
 **Trade-off:** Zoho runs separate regions, so the region Zoho reports on return is checked against a list of real Zoho addresses before any key is exchanged.
+
+## 14. The CRM only ever receives what the server builds, and nothing without a press
+
+**Problem:** Once Here. can write to a CRM, a forged request or a stale page could put the wrong thing in someone's records.
+
+**Choice:** Notes, field values and Tasks are built on the server from stored marks. The browser sends only ids. Imports read the contacts from Zoho again instead of trusting names from the page. A suggested check-in is worked out again when it is approved, so a stale or forged approval creates nothing. Suggestions are never created automatically, and a dealt-with one stays quiet for 14 days.
+
+**Trade-off:** Zoho's permissions grew (update Contacts, create Tasks), so older connections show an Update permissions button and keep their links when they reconnect. The sample CRM keeps its state in the browser, so it never touches a real account and cannot leak between accounts.

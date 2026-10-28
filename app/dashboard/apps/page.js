@@ -1,10 +1,13 @@
 "use client";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/client";
+import { zohoAdapter, demoAdapter } from "@/lib/crm-client";
 import { PageHead, Panel, Loading, ConfirmButton, useAccount } from "../ui";
+import CrmPanel from "./CrmPanel";
+import SampleCrm from "./SampleCrm";
 
 const ERRORS = {
   sandbox: "Apps can only be connected to your real register, not the sandbox or the demo.",
@@ -30,6 +33,9 @@ function Apps() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const zoho = data?.connections.find((c) => c.provider === "zoho");
+  const zohoCrm = useMemo(() => zohoAdapter(), []);
+  const demoCrm = useMemo(() => demoAdapter(), []);
+  const [seen, setSeen] = useState(0);
 
   return (
     <>
@@ -37,19 +43,32 @@ function Apps() {
       <div className="r-body" style={{ maxWidth: 820 }}>
         {!data ? <Loading rows={3} /> : (
           <>
-            <Panel title="Zoho CRM" pad>
-              <p style={{ marginTop: 0 }}>Link a student to a Contact in your own Zoho, then add an attendance summary to that Contact with one tap from their profile.</p>
-              <p className="r-muted r-small">Here. can read your Contacts and add notes. It cannot see deals, emails or anything else, and it only sends a note when you press Send.</p>
-              {!data.allowed || sandbox ? <p className="r-muted" style={{ marginBottom: 0 }}>Switch to My register to connect apps. The sandbox and the demo never connect to real accounts.</p>
-                : zoho ? (
-                  <div className="r-row">
-                    <span className="r-grow">Connected to <b>{zoho.label || "Zoho CRM"}</b></span>
-                    <ConfirmButton className="r-btn r-btn-ghost" label="Disconnect" title="Disconnect Zoho CRM?" confirmLabel="Disconnect"
-                      message="Here. will cancel its access with Zoho and forget which students are linked to which Contacts. Nothing in Zoho is deleted."
-                      onConfirm={async () => { try { await api.del("/api/connections?provider=zoho"); toast.success("Zoho CRM disconnected."); load(); } catch (e) { toast.error(e.message); } }} />
-                  </div>
-                ) : <a className="r-btn" href="/api/connect/zoho">Connect Zoho CRM</a>}
-            </Panel>
+            {sandbox ? (
+              <Panel title="Sample CRM" pad>
+                <p style={{ marginTop: 0 }}>A made-up CRM built into Here., so you can try everything the Zoho connection does without connecting anything: import students from contacts, link a student, send an attendance note, update fields and approve check-in tasks.</p>
+                <p className="r-muted r-small">It lives in this browser only. Switch to My register to connect a real Zoho CRM.</p>
+                <CrmPanel crm={demoCrm} onChange={() => setSeen((n) => n + 1)} />
+                <SampleCrm version={seen} />
+              </Panel>
+            ) : (
+              <Panel title="Zoho CRM" pad>
+                <p style={{ marginTop: 0 }}>Bring students in from your own Zoho, link each one to a Contact, then send attendance back as a note, as fields Zoho can report on, or as a check-in task you approve.</p>
+                <p className="r-muted r-small">Here. can read and update your Contacts and add notes and tasks. It cannot see deals, emails or anything else, and it only writes to Zoho when you press a button.</p>
+                {!data.allowed ? <p className="r-muted" style={{ marginBottom: 0 }}>Switch to My register to connect apps. The sandbox and the demo never connect to real accounts.</p>
+                  : zoho ? (
+                    <>
+                      <div className="r-row">
+                        <span className="r-grow">Connected to <b>{zoho.label || "Zoho CRM"}</b></span>
+                        {zoho.scopeVersion < 2 ? <a className="r-btn" href="/api/connect/zoho">Update permissions</a> : null}
+                        <ConfirmButton className="r-btn r-btn-ghost" label="Disconnect" title="Disconnect Zoho CRM?" confirmLabel="Disconnect"
+                          message="Here. will cancel its access with Zoho and forget which students are linked to which Contacts. Nothing in Zoho is deleted."
+                          onConfirm={async () => { try { await api.del("/api/connections?provider=zoho"); toast.success("Zoho CRM disconnected."); load(); } catch (e) { toast.error(e.message); } }} />
+                      </div>
+                      <CrmPanel crm={zohoCrm} current={zoho.scopeVersion >= 2} />
+                    </>
+                  ) : <a className="r-btn" href="/api/connect/zoho">Connect Zoho CRM</a>}
+              </Panel>
+            )}
 
             <Panel title="WhatsApp and email" pad>
               <p style={{ marginTop: 0 }}>Ask a parent or carer about an absence from the student&apos;s profile. The message opens in your own WhatsApp or email with a polite note filled in, so you can check it before sending.</p>

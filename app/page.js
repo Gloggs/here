@@ -112,7 +112,7 @@ export default async function Home({ searchParams }) {
         <section className="l-section l-works" aria-labelledby="works">
           <h2 id="works" className="l-h2">Works with the tools you already use</h2>
           <ul className="l-works-list">
-            <li><b>Zoho CRM</b><span>Send attendance to a Contact</span></li>
+            <li><b>Zoho CRM</b><span>Import students, send attendance back</span></li>
             <li><b>WhatsApp</b><span>Ask a parent about an absence</span></li>
             <li><b>Email</b><span>The same note, by email</span></li>
             <li><b>YouTube</b><span>Play a clip in class</span></li>
