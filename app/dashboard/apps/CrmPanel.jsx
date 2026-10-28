@@ -45,7 +45,7 @@ export default function CrmPanel({ crm, current = true, onChange }) {
             <button className="r-btn r-btn-ghost" onClick={updateAll} disabled={busy === "fields"}>{busy === "fields" ? "Updating…" : "Update attendance fields"}</button>
           </div>
           {crm.kind === "zoho" ? (
-            <p className="r-muted r-small">Update fields fills in three fields on each linked Contact. Add them once in Zoho, under Setup, Modules and Fields, Contacts, using the labels <b>Here Attendance</b> (number), <b>Here Status</b> (single line) and <b>Here Last Marked</b> (date).</p>
+            <p className="r-muted r-small">Update fields fills in three fields on each linked Contact. Add them once in Zoho, under Setup, Modules and Fields, Contacts, using the labels <b>Here Attendance</b> (Decimal), <b>Here Status</b> (Single Line) and <b>Here Last Marked</b> (Date). Drag each type in from New Fields on the left, then name it.</p>
           ) : null}
 
           <h3 id="checkins" className="r-zoho-title" style={{ marginTop: 20, scrollMarginTop: 24 }}>Suggested check-ins</h3>

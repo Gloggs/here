@@ -37,7 +37,8 @@ export default function Privacy() {
       <ul>
         <li><b>Zoho CRM.</b> Here. can read your Contacts, so you can link a student to one or import students from them. When you press a button it can add a note, update three attendance fields, or create a check-in Task on a Contact. It cannot see deals, emails or other records, and it writes nothing to Zoho until you press the button or approve the Task.</li>
         <li><b>WhatsApp and email.</b> The Message buttons open your own WhatsApp or email app with a note filled in. Nothing is sent until you send it there, and Here. does not connect to either service.</li>
-        <li><b>YouTube and Spotify.</b> Videos and playlists you open in the Toolkit play from those sites, which apply their own privacy terms. YouTube is loaded in its privacy-enhanced mode.</li>
+        <li><b>YouTube and Spotify.</b> Videos and playlists you open in the music player play from those sites, which apply their own privacy terms. YouTube is loaded in its privacy-enhanced mode. The last link you played is remembered in your browser only.</li>
+        <li><b>Sample CRM.</b> In the sandbox and the demo, a made-up CRM shows how the Zoho connection works. What you send it stays in your browser and never reaches a real CRM or our database.</li>
       </ul>
       <p>Connection keys are encrypted before they are stored and are never sent to your browser. Disconnecting an app, or deleting your account, cancels its access with that company and removes the key.</p>
 
