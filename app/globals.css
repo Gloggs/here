@@ -661,3 +661,4 @@ html:has(.r-space.is-leave-left), html:has(.r-space.is-leave-right), html:has(.r
 /* Phones and tablets have no keyboard shortcut to show, and the music button should not sit over the last line of a page. */
 @media (hover: none), (pointer: coarse) { .r-cmd-btn kbd, .r-cmd-input kbd { display: none; } }
 @media (max-width: 899px) { #main { padding-bottom: 72px; } }
+.r-cmd-btn .r-grow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

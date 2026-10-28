@@ -29,7 +29,7 @@ export function SideNav() {
     <nav className="r-side" aria-label="Main">
       <Link href="/dashboard" className="r-brand" aria-label="Here. today"><Logo onDark height={36} /></Link>
       <div className="r-side-space"><SpaceTabs /></div>
-      <div className="r-side-search"><CommandButton dark /></div>
+      <div className="r-side-search"><CommandButton dark label="Search" /></div>
       {ITEMS.map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href} aria-current={isCurrent(path, href) ? "page" : undefined}>
           <Icon size={18} aria-hidden="true" /> {label}
