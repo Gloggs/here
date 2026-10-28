@@ -1,17 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { api, localIso, qs } from "@/lib/client";
 import { PageHead, Dialog, Loading, ClassCard, NewClassForm } from "../ui";
 
-export default function Classes() {
+function Classes() {
   const router = useRouter();
+  const params = useSearchParams();
   const [classes, setClasses] = useState(null);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (params.get("new")) { setAdding(true); router.replace("/dashboard/classes", { scroll: false }); }
+  }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     api.get(`/api/overview?${qs({ date: localIso() })}`).then((d) => setClasses(d.classes)).catch((e) => setError(e.message));
   }, []);
@@ -39,4 +43,8 @@ export default function Classes() {
       </Dialog>
     </>
   );
+}
+
+export default function ClassesPage() {
+  return <Suspense fallback={<Loading />}><Classes /></Suspense>;
 }

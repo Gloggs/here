@@ -19,6 +19,9 @@ const FAQ = [
   ["What is the class goal?", <>A weekly attendance target the whole class works towards, with a reward you choose. Set it in the class&apos;s <b>Settings</b>. Here. celebrates full weeks and improvement, and never ranks pupils by attendance.</>],
   ["Can I track work, not just attendance?", <>Yes. Every group has a <b>Tasks</b> tab. Set a task with a due date, then mark each person done, late or not done, and their share of the work. Here. shows who is doing what over time. Set a group to <b>Team</b> in Settings and it opens on its tasks.</>],
   ["What is in the toolkit?", <>Press <b>Tools</b> on a class page to pick a name from the people here today, split them into random groups, or run a timer.</>],
+  ["How do I find things quickly?", <>Press <b>Ctrl K</b> (<b>Cmd K</b> on a Mac), or the search box at the top of the menu. Type a student, a class, or what you want to do, such as <b>import</b>, <b>report</b> or <b>music</b>, and press Enter.</>],
+  ["How does the Zoho CRM connection work?", <>Connect your own Zoho on the <b>Apps</b> page. Then <b>Import students</b> from your Contacts (on Today, Students, or a class&apos;s Students tab), and send attendance back from a student&apos;s profile as a note or as fields Zoho can report on. When someone misses three days in a row or drops below 90%, Today shows a <b>check-in</b> you can turn into a Zoho task. Nothing is written to Zoho until you press a button. In the sandbox and the demo, a made-up <b>sample CRM</b> lets you try all of it.</>],
+  ["How do I play music in class?", <>Press <b>Music</b> in the menu, or <b>Play music</b> on Today, and paste a YouTube or Spotify link. It keeps playing as you move around, shrinks to a small button, and on Chrome or Edge can pop out into its own floating window.</>],
   ["What is the sandbox?", <>A second space next to your real register, filled with a sample class. Switch with the <b>My register</b> and <b>Sandbox</b> tabs at the top, or press <b>Ctrl + Alt</b> and an arrow key. Use <b>Sandbox tools</b> to fill in a day, simulate a bad week or reset it. Nothing you do there reaches your real classes.</>],
 ];
 
@@ -47,7 +50,8 @@ export default function Help() {
         </tbody>
       </table>
       <h2 id="shortcuts">Keyboard shortcuts</h2>
-      <p>On a computer, while taking the register:</p>
+      <p>Anywhere in the app: <kbd>Ctrl</kbd> <kbd>K</kbd> (or <kbd>Cmd</kbd> <kbd>K</kbd>) opens search and actions. <kbd>Ctrl</kbd> <kbd>Alt</kbd> and an arrow key switches between your register and the sandbox.</p>
+      <p>While taking the register:</p>
       <ul>
         <li><kbd>↓</kbd> or <kbd>J</kbd> moves to the next student, and <kbd>↑</kbd> or <kbd>K</kbd> moves to the previous one.</li>
         <li><kbd>/</kbd>, <kbd>L</kbd> or <kbd>N</kbd> marks the highlighted student and moves on. <kbd>P</kbd> and <kbd>A</kbd> also work.</li>

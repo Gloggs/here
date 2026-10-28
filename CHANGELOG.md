@@ -2,6 +2,10 @@
 
 ## 2.1 (October 2026)
 
+- Search and actions: press Ctrl K (Cmd K on a Mac), or the search box in the menu, to jump to any student, class or page, or to import, report, play music and more.
+- Zoho is now where you need it: on Today (with check-ins waiting), beside Add students, on each class's Students tab, and near the top of each student's profile.
+- Music has its own place in the menu and on Today.
+
 - Apps page: connect your own Zoho CRM, link students to Contacts and send attendance notes.
 - Import students from Zoho Contacts into a class, filtered by tag, already linked.
 - Update attendance fields on Contacts (percentage, status, last marked) so Zoho can report on them.
