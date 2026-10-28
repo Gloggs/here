@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
-  metadataBase: new URL(process.env.KINDE_SITE_URL || "https://webattendancesystem.vercel.app"),
+  metadataBase: new URL(process.env.KINDE_SITE_URL || "https://here.guilduk.com"),
   title: "Here.",
   description: "A simple, private class register: mark attendance, spot patterns and export reports.",
   applicationName: "Here.",

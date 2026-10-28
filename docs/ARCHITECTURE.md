@@ -60,6 +60,8 @@ Neon Postgres (Drizzle ORM)
 
 ## Main API routes
 
+Connected apps: `/api/connect/zoho` starts the Zoho sign-in, `/api/connect/zoho/callback` finishes it, `/api/connections` lists or disconnects apps, and `/api/zoho/contacts`, `/api/zoho/link` and `/api/zoho/note` search Contacts, link a student and send a note. Keys are handled in `lib/connections.js` and `lib/crypto.js`.
+
 | Route | Methods | Purpose |
 | --- | --- | --- |
 | `/api/overview` | GET | Today, this week, school year, students below 90%, absences with no reason |

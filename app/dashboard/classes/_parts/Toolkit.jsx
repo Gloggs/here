@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Wrench, Shuffle, UsersRound, Timer as TimerIcon } from "lucide-react";
+import { Wrench, Shuffle, UsersRound, Timer as TimerIcon, Music } from "lucide-react";
+import { mediaEmbed } from "@/lib/media";
 import { api, qs, localIso } from "@/lib/client";
 import { makeGroups } from "@/lib/insights";
 import { Dialog, Avatar } from "../../ui";
@@ -109,7 +110,41 @@ function Timer() {
   );
 }
 
-const TOOLS = [["pick", "Pick a name", Shuffle], ["groups", "Make groups", UsersRound], ["timer", "Timer", TimerIcon]];
+const MEDIA_KEY = "here_media";
+
+/** A YouTube video or Spotify playlist to play in class, from a pasted link. */
+function Media() {
+  const [link, setLink] = useState("");
+  const [embed, setEmbed] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    try { const saved = localStorage.getItem(MEDIA_KEY); if (saved) { setLink(saved); setEmbed(mediaEmbed(saved)); } } catch {}
+  }, []);
+  function play(e) {
+    e.preventDefault();
+    const m = mediaEmbed(link);
+    if (!m) { setError("Paste a link from YouTube or Spotify."); return; }
+    setError(""); setEmbed(m);
+    try { localStorage.setItem(MEDIA_KEY, link.trim()); } catch {}
+  }
+  return (
+    <div className="r-tool">
+      <form className="r-row" onSubmit={play} style={{ gap: 8 }}>
+        <input className="r-input r-grow" value={link} onChange={(e) => setLink(e.target.value)} placeholder="Paste a YouTube or Spotify link" aria-label="YouTube or Spotify link" inputMode="url" />
+        <button className="r-btn">Play</button>
+      </form>
+      {error ? <p className="r-error">{error}</p> : null}
+      {embed ? (
+        <div className={`r-media${embed.kind === "youtube" ? " is-video" : ""}`} style={embed.height ? { height: embed.height } : undefined}>
+          <iframe src={embed.src} title={embed.kind === "youtube" ? "YouTube video" : "Spotify player"} loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+        </div>
+      ) : <p className="r-muted r-small" style={{ margin: 0 }}>Calm music for group work, a countdown video, or a clip for the lesson. Spotify plays full tracks if you are signed in to Spotify in this browser.</p>}
+    </div>
+  );
+}
+
+const TOOLS = [["pick", "Pick a name", Shuffle], ["groups", "Make groups", UsersRound], ["timer", "Timer", TimerIcon], ["media", "Media", Music]];
 
 export default function Toolkit({ cls }) {
   const [open, setOpen] = useState(false);
@@ -119,15 +154,16 @@ export default function Toolkit({ cls }) {
     <>
       <button className="r-btn r-btn-ghost" onClick={() => setOpen(true)}><Wrench size={18} aria-hidden="true" /> Tools</button>
       <Dialog open={open} onClose={() => setOpen(false)} title={`Tools for ${cls.name}`}>
-        <div className="r-seg r-seg-big" role="tablist" aria-label="Tool" style={{ marginBottom: 16 }}>
+        <div className="r-seg r-seg-big r-seg-tools" role="tablist" aria-label="Tool" style={{ marginBottom: 16 }}>
           {TOOLS.map(([k, label, Icon]) => (
             <button key={k} className="is-on" role="tab" aria-selected={tool === k} aria-pressed={tool === k} onClick={() => setTool(k)}><Icon size={20} aria-hidden="true" /> {label}</button>
           ))}
         </div>
-        {tool !== "timer" ? <p className="r-muted r-small" style={{ marginTop: 0 }}>{here ? here.note : "Loading names…"}</p> : null}
+        {tool === "pick" || tool === "groups" ? <p className="r-muted r-small" style={{ marginTop: 0 }}>{here ? here.note : "Loading names…"}</p> : null}
         {tool === "pick" && here ? <Picker people={here.people} /> : null}
         {tool === "groups" && here ? <Groups people={here.people} /> : null}
         {tool === "timer" ? <Timer /> : null}
+        {tool === "media" ? <Media /> : null}
       </Dialog>
     </>
   );

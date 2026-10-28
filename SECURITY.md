@@ -2,9 +2,12 @@
 
 ## Reporting a problem
 
-If you find a security issue, please do not open a public issue. Contact Michael Ijisonuwe through the details on his GitHub profile, with steps to reproduce it. You will get a reply within a week.
+If you find a security issue, please do not open a public issue. Email michael@guilduk.com with steps to reproduce it. You will get a reply within a week.
 
 ## How the app protects data
+
+- **Connected apps:** each account connects its own Zoho CRM. Connection keys are encrypted with AES-256-GCM before they are stored, the encryption key lives only in the server's environment, and keys are never sent to the browser. Every lookup uses the account id from the signed-in session. Connecting uses a one-time state value signed with the account id and checked on return, and only real Zoho addresses are accepted. Disconnecting or deleting an account cancels access with Zoho. The sandbox and the demo cannot connect apps. Notes sent to Zoho are built on the server from stored marks, so the browser cannot send anything else.
+- **Headers:** a Content Security Policy allows only the site's own scripts, and frames from YouTube (privacy-enhanced mode) and Spotify. HSTS, no framing by other sites, no MIME sniffing and a strict referrer policy are set on every response.
 
 - **Sign-in:** handled by Kinde. The app never sees or stores passwords.
 - **Two checks on every request:** `middleware.js` turns away requests with no session, and each API route checks the session again (`lib/auth.js`).

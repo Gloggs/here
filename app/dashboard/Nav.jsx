@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, LayoutGrid, Users, FileText, Settings, Menu } from "lucide-react";
+import { Sun, LayoutGrid, Users, FileText, Settings, Menu, Blocks } from "lucide-react";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
 import { StudentSearch, useAccount } from "./ui";
 import { SpaceTabs } from "./Workspace";
@@ -12,6 +12,7 @@ const ITEMS = [
   { href: "/dashboard/classes", label: "Classes", icon: LayoutGrid },
   { href: "/dashboard/students", label: "Students", icon: Users },
   { href: "/dashboard/reports", label: "Reports", icon: FileText },
+  { href: "/dashboard/apps", label: "Apps", icon: Blocks },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -49,7 +50,7 @@ const PHONE = [
   { href: "/dashboard", label: "Today", icon: Sun },
   { href: "/dashboard/classes", label: "Classes", icon: LayoutGrid },
   { href: "/dashboard/reports", label: "Reports", icon: FileText },
-  { href: "/dashboard/more", label: "More", icon: Menu, also: ["/dashboard/students", "/dashboard/settings"] },
+  { href: "/dashboard/more", label: "More", icon: Menu, also: ["/dashboard/students", "/dashboard/settings", "/dashboard/apps"] },
 ];
 
 export function BottomNav() {
