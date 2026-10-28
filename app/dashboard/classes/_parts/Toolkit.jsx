@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Wrench, Shuffle, UsersRound, Timer as TimerIcon, Music } from "lucide-react";
-import { mediaEmbed } from "@/lib/media";
+import { openMedia } from "../../MediaDock";
 import { api, qs, localIso } from "@/lib/client";
 import { makeGroups } from "@/lib/insights";
 import { Dialog, Avatar } from "../../ui";
@@ -110,40 +110,6 @@ function Timer() {
   );
 }
 
-const MEDIA_KEY = "here_media";
-
-/** A YouTube video or Spotify playlist to play in class, from a pasted link. */
-function Media() {
-  const [link, setLink] = useState("");
-  const [embed, setEmbed] = useState(null);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    try { const saved = localStorage.getItem(MEDIA_KEY); if (saved) { setLink(saved); setEmbed(mediaEmbed(saved)); } } catch {}
-  }, []);
-  function play(e) {
-    e.preventDefault();
-    const m = mediaEmbed(link);
-    if (!m) { setError("Paste a link from YouTube or Spotify."); return; }
-    setError(""); setEmbed(m);
-    try { localStorage.setItem(MEDIA_KEY, link.trim()); } catch {}
-  }
-  return (
-    <div className="r-tool">
-      <form className="r-row" onSubmit={play} style={{ gap: 8 }}>
-        <input className="r-input r-grow" value={link} onChange={(e) => setLink(e.target.value)} placeholder="Paste a YouTube or Spotify link" aria-label="YouTube or Spotify link" inputMode="url" />
-        <button className="r-btn">Play</button>
-      </form>
-      {error ? <p className="r-error">{error}</p> : null}
-      {embed ? (
-        <div className={`r-media${embed.kind === "youtube" ? " is-video" : ""}`} style={embed.height ? { height: embed.height } : undefined}>
-          <iframe src={embed.src} title={embed.kind === "youtube" ? "YouTube video" : "Spotify player"} loading="lazy"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
-        </div>
-      ) : <p className="r-muted r-small" style={{ margin: 0 }}>Calm music for group work, a countdown video, or a clip for the lesson. Spotify plays full tracks if you are signed in to Spotify in this browser.</p>}
-    </div>
-  );
-}
-
 const TOOLS = [["pick", "Pick a name", Shuffle], ["groups", "Make groups", UsersRound], ["timer", "Timer", TimerIcon], ["media", "Media", Music]];
 
 export default function Toolkit({ cls }) {
@@ -163,7 +129,7 @@ export default function Toolkit({ cls }) {
         {tool === "pick" && here ? <Picker people={here.people} /> : null}
         {tool === "groups" && here ? <Groups people={here.people} /> : null}
         {tool === "timer" ? <Timer /> : null}
-        {tool === "media" ? <Media /> : null}
+        {tool === "media" ? <div className="r-tool"><p style={{ margin: 0 }}>Play a YouTube video or a Spotify playlist in a small player that stays open while you take the register or move between pages.</p><button className="r-btn" onClick={() => { setOpen(false); openMedia(); }}>Open the media player</button></div> : null}
       </Dialog>
     </>
   );
