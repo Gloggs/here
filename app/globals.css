@@ -600,3 +600,15 @@ html:has(.r-space.is-leave-left), html:has(.r-space.is-leave-right), html:has(.r
 .r-tools li { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line, #E6DAD7); }
 .r-tools li:first-child { border-top: 0; padding-top: 0; }
 .r-tools .r-btn { flex-shrink: 0; min-width: 84px; }
+.r-zoho { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.r-zoho-title { margin: 0 0 10px; font-size: 14px; }
+.r-media { width: 100%; border: 1px solid var(--line-strong); background: #262220; }
+.r-media.is-video { aspect-ratio: 16 / 9; }
+.r-media iframe { width: 100%; height: 100%; border: 0; display: block; }
+.r-seg-tools { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 520px) { .r-seg-tools button { font-size: 12px; } }
+.l-works { padding-top: 0; }
+.l-works-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.l-works-list li { background: var(--surface); padding: 20px; display: grid; gap: 4px; }
+.l-works-list b { font-size: 18px; }
+.l-works-list span { color: var(--muted); font-size: 14px; }

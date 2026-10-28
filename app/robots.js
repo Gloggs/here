@@ -1,4 +1,4 @@
-const SITE = process.env.KINDE_SITE_URL || "https://webattendancesystem.vercel.app";
+const SITE = process.env.KINDE_SITE_URL || "https://here.guilduk.com";
 
 export default function robots() {
   return {

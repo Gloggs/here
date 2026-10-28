@@ -2,17 +2,18 @@ import { NextResponse } from "next/server";
 import { getOwnerId, getUserId, unauthorized, serverError } from "@/lib/auth";
 import { SANDBOX_SUFFIX } from "@/lib/guest";
 import { removeAccount, removeProfile } from "@/lib/cleanup";
+import { removeAllConnections } from "@/lib/connections";
 
 export const dynamic = 'force-dynamic';
 
 // DELETE /api/account: removes every class, student, photo, mark, point, task and day off this account owns,
-// in both the real register and the sandbox.
+// in both the real register and the sandbox, and disconnects every connected app.
 export async function DELETE() {
   const ownerId = await getOwnerId();
   if (!ownerId) return unauthorized();
   try {
     const userId = await getUserId();
-    if (userId) { await removeAccount(userId); await removeAccount(`${userId}${SANDBOX_SUFFIX}`); await removeProfile(userId); }
+    if (userId) { await removeAccount(userId); await removeAccount(`${userId}${SANDBOX_SUFFIX}`); await removeProfile(userId); await removeAllConnections(userId); }
     else await removeAccount(ownerId);
     return NextResponse.json({ success: true });
   } catch (error) {

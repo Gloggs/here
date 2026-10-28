@@ -64,3 +64,11 @@ Short records of the choices that shaped the app, and why.
 **Choice:** Every signed-in user has two spaces, like two desktops. The sandbox uses the owner id `<user id>::sandbox`, picked by an httpOnly cookie that `getOwnerId()` reads. Because every query already filters by owner id, the sandbox is isolated by the same rule that keeps accounts apart, with no schema change. Sandbox tools (`/api/sandbox`) refuse to run anywhere else, so a real register can never be reset or filled with made-up marks. Demo guests are always in a sandbox.
 
 **Trade-off:** Deleting an account has to remember both ids. That lives in one place, `/api/account`.
+
+## 13. Each account connects its own apps, with encrypted keys
+
+**Problem:** Linking a CRM such as Zoho is useful, but every account has its own Zoho and its own pupils. One shared integration would mix people's data.
+
+**Choice:** Each user connects their own Zoho through OAuth. The keys Zoho returns are encrypted with AES-256-GCM and stored against that account's id only. The browser never sees them, the connect step is protected by a signed one-time state, and disconnecting cancels access with Zoho. Only three narrow scopes are requested: read Contacts, create notes and read the organisation name. WhatsApp, email, YouTube and Spotify need no connection at all, so they carry no stored keys.
+
+**Trade-off:** Zoho runs separate regions, so the region Zoho reports on return is checked against a list of real Zoho addresses before any key is exchanged.

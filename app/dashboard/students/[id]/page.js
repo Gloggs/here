@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, qs, shortDate, pct, flag } from "@/lib/client";
 import { PageHead, Panel, Bar, Dialog, Loading, ConfirmButton, Avatar, useAccount } from "../../ui";
+import ContactPanel from "./ContactPanel";
 import PhotoEditor from "../../PhotoEditor";
 import { Pencil } from "lucide-react";
 import StudentForm from "../StudentForm";
@@ -17,7 +18,7 @@ export default function StudentProfile({ params }) {
   const [classes, setClasses] = useState([]);
   const [editing, setEditing] = useState(false);
   const [photo, setPhoto] = useState(false);
-  const { guest } = useAccount();
+  const { guest, sandbox } = useAccount();
   const [error, setError] = useState("");
 
   const load = () => Promise.all([api.get(`/api/student/${params.id}`), api.get("/api/classes")])
@@ -96,6 +97,8 @@ export default function StudentProfile({ params }) {
             </ul>
           )}
         </Panel>
+
+        <ContactPanel student={student} recent={recent} sandbox={sandbox} />
 
         <div className="r-row">
           <Link className="r-btn r-btn-ghost" href="/dashboard/students">Back to students</Link>

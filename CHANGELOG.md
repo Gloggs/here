@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1 (October 2026)
+
+- Apps page: connect your own Zoho CRM, link students to Contacts and send attendance notes.
+- Message a parent about an absence on WhatsApp or by email, from the student's profile.
+- YouTube and Spotify player in a class's Tools.
+- Choose the name the app shows for you.
+- Sandbox: a separate practice space with its own tools.
+- Content Security Policy and other security headers.
+- New address: here.guilduk.com.
+
 ## 2.0 (October 2026)
 
 - New name and brand: Here.

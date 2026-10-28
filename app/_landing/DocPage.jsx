@@ -22,11 +22,12 @@ export default function DocPage({ title, updated, children }) {
 export function SiteFooter() {
   return (
     <footer className="l-foot">
-      <span>Built by Michael Ijisonuwe with Next.js, Postgres and Kinde.</span>
+      <span>Here. is a personal project by Michael Ijisonuwe, built under the Guild UK name. It is not a commercial service.</span>
       <nav className="r-row" aria-label="Footer" style={{ gap: 16 }}>
         <Link href="/help">Help</Link>
         <Link href="/privacy">Privacy</Link>
         <Link href="/terms">Terms</Link>
+        <a href="mailto:michael@guilduk.com">Contact</a>
       </nav>
     </footer>
   );
