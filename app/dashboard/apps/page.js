@@ -7,6 +7,7 @@ import { api } from "@/lib/client";
 import { zohoAdapter, demoAdapter, forgetCrmStatus } from "@/lib/crm-client";
 import { PageHead, Panel, Loading, ConfirmButton, useAccount } from "../ui";
 import CrmPanel from "./CrmPanel";
+import { openMedia } from "../MediaDock";
 import SampleCrm from "./SampleCrm";
 
 const ERRORS = {
@@ -76,11 +77,12 @@ function Apps() {
             </Panel>
 
             <Panel title="YouTube and Spotify" pad>
-              <p style={{ marginTop: 0 }}>Play a video or a playlist from a class&apos;s Tools, next to the timer and the name picker. Paste any YouTube or Spotify link.</p>
-              <p className="r-muted r-small" style={{ marginBottom: 0 }}>Nothing to connect. YouTube plays in privacy-enhanced mode.</p>
+              <p style={{ marginTop: 0 }}>Paste any YouTube or Spotify link. The player keeps going as you move between pages, shrinks to a small button, and on Chrome or Edge pops out into its own floating window. Open it from <b>Music</b> in the menu, <b>Play music</b> on Today, or a class&apos;s Tools.</p>
+              <div className="r-row"><button className="r-btn" onClick={openMedia}>Open the player</button></div>
+              <p className="r-muted r-small" style={{ marginBottom: 0 }}>Nothing to connect. YouTube plays in privacy-enhanced mode. Spotify plays full tracks when you are signed in to Spotify in this browser, otherwise 30-second previews.</p>
             </Panel>
 
-            <p className="r-muted r-small">Coming later: Canva certificates, Google Classroom and Microsoft Teams. Read how connections are kept private on the <Link href="/privacy">privacy page</Link>.</p>
+            <p className="r-muted r-small">Read how connections are kept private on the <Link href="/privacy">privacy page</Link>.</p>
           </>
         )}
       </div>

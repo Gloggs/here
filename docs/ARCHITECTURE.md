@@ -22,9 +22,12 @@ Neon Postgres (Drizzle ORM)
 | Path | What lives there |
 | --- | --- |
 | `app/page.js` | Landing page, including the tap-to-try register in `app/_landing/DemoRegister.jsx` |
-| `app/dashboard/` | The signed-in app: Today, Classes, Students, Reports, Settings, More |
+| `app/dashboard/` | The signed-in app: Today, Classes, Students, Reports, Apps, Settings, More |
 | `app/dashboard/classes/[id]/` | One class, with Register, Month, Students and Settings tabs |
-| `app/dashboard/ui.jsx` | Shared pieces: page header, panels, dialogs, search, forms |
+| `app/dashboard/ui.jsx` | Shared pieces: page header, panels, dialogs, forms |
+| `app/dashboard/Command.jsx` | Search and actions (`Ctrl K`), and the import dialog any page can open |
+| `app/dashboard/MediaDock.jsx` | The music player that stays open across pages and can pop out |
+| `app/dashboard/apps/` | The Apps page, the CRM panel (import, fields, check-ins) and the sample CRM view |
 | `app/api/` | Route handlers, one folder per resource |
 | `app/_brand/` | Logo and wordmark |
 | `lib/auth.js` | Session check (Kinde user or demo guest) and standard error responses |
