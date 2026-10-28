@@ -1,0 +1,20 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [stable-v2]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The tests cover the pure attendance maths and input checks, so they need no packages.
+      - run: npm test
