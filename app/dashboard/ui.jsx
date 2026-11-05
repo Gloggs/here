@@ -70,7 +70,7 @@ export function PageHead({ title, sub, back, lead, children }) {
   useEffect(() => { if (typeof title === "string") document.title = `${title} | Here.`; }, [title]);
   return (
     <header className="r-head">
-      {back ? <Link className={`r-back${back.phoneOnly ? " r-phone-only" : ""}`} href={back.href}>← {back.label}</Link> : null}
+      {back ? <Link className={`r-back${back.phoneOnly ? " r-phone-only" : ""}`} href={back.href}>Back to {back.label.toLowerCase()}</Link> : null}
       <div className="r-head-row">
         {lead ? <div className="r-head-lead">{lead}<h1 className="r-title">{title}</h1></div> : <h1 className="r-title">{title}</h1>}
         {children ? <div className="r-row">{children}</div> : null}
