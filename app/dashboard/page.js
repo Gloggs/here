@@ -7,7 +7,7 @@ import { Plus, Check, X, Upload, RefreshCw, ClipboardCheck, Music } from "lucide
 import { api, qs, localIso, longDate, shortDate, pct, flag } from "@/lib/client";
 import { PageHead, Panel, Bar, Loading, ClassCard, NewClassForm, Dialog, useAccount } from "./ui";
 import { useCrm } from "@/lib/crm-client";
-import { CommandButton, openImport } from "./Command";
+import { openImport } from "./Command";
 import { openMedia } from "./MediaDock";
 import { useSpace } from "./Workspace";
 
@@ -160,10 +160,12 @@ function Today() {
   return (
     <>
       <PageHead title={`${greeting()}${name}`}
-        sub={data.isDayOff ? `${longDate(today)}. Marked as a day off.` : `${longDate(today)}. ${left.length ? `${left.length} ${left.length === 1 ? "register" : "registers"} to take.` : "All registers taken."}${data.streak >= 2 ? ` Registers taken ${data.streak} school days in a row.` : ""}`} />
+        sub={data.isDayOff ? `${longDate(today)}. Marked as a day off.` : `${longDate(today)}. ${left.length ? `${left.length} ${left.length === 1 ? "register" : "registers"} to take.` : "All registers taken."}${data.streak >= 2 ? ` Registers taken ${data.streak} days in a row.` : ""}`} />
       <div className="r-body">
-        <GettingStarted data={data} />
-        <div className="r-mobile-only"><CommandButton /></div>
+        {/* Jobs to be Done: the one job when a session starts is taking the register, so it comes first on every screen size */}
+        <NextRegister c={data.isDayOff ? null : left[0]} more={Math.max(0, left.length - 1)} />
+
+        {attention ? <NeedsAttention data={data} attention={attention} /> : null}
 
         <section aria-labelledby="regs">
           <div className="r-section-head">
@@ -175,12 +177,65 @@ function Today() {
           </div>
         </section>
 
+        {attention ? null : <p className="r-muted" style={{ margin: 0 }}>Nobody needs a check-in today: everyone is at or above {data.threshold}% and every absence has a reason.</p>}
+
+        <GettingStarted data={data} />
+
+        <section aria-labelledby="nums">
+          <h2 id="nums" className="r-h2">At a glance</h2>
+          <div className="r-stats">
+            <div className="r-stat r-stat-key"><div className="r-stat-num">{pct(data.today.pct)}</div><div className="r-stat-label">In today ({data.today.marked} marked)</div></div>
+            <div className="r-stat"><div className="r-stat-num">{pct(data.week.pct)}</div><div className="r-stat-label">This week</div></div>
+            <div className="r-stat"><div className="r-stat-num">{pct(data.year.pct)}</div><div className="r-stat-label">This year so far</div></div>
+            <div className="r-stat"><div className="r-stat-num">{data.totals.students}</div><div className="r-stat-label">Students in {data.totals.classes} {data.totals.classes === 1 ? "class" : "classes"}</div></div>
+          </div>
+          <p style={{ marginTop: 12 }}><Link href="/dashboard/reports">See full reports</Link></p>
+        </section>
+
+        <section aria-labelledby="apps">
+          <div className="r-section-head">
+            <h2 id="apps" className="r-h2">Your apps</h2>
+            <button className="r-linkbtn" onClick={openMedia}><Music size={16} aria-hidden="true" /> Play music</button>
+          </div>
+          <TodayCrm />
+        </section>
+      </div>
+      <Dialog open={adding} onClose={() => setAdding(false)} title="New class">
+        <NewClassForm onDone={(cls, n) => { toast.success(`${cls.name} created.`); router.push(`/dashboard/classes/${cls.id}${n ? "" : "?tab=students"}`); }} />
+      </Dialog>
+    </>
+  );
+}
+
+/** The first thing on Today: the next register still to take, as one large button. */
+function NextRegister({ c, more }) {
+  if (!c) {
+    return (
+      <section className="r-next is-done" aria-labelledby="next">
+        <h2 id="next" className="r-next-title">Every register is taken</h2>
+        <p className="r-next-sub">Nothing left to mark today.</p>
+      </section>
+    );
+  }
+  const started = c.markedToday > 0;
+  return (
+    <section className="r-next" aria-labelledby="next">
+      <h2 id="next" className="r-next-title">{c.name}</h2>
+      <p className="r-next-sub">{started ? `${c.markedToday} of ${c.students} marked so far.` : `${c.students} ${c.students === 1 ? "student" : "students"} to mark.`}{more ? ` Then ${more} more ${more === 1 ? "register" : "registers"}.` : ""}</p>
+      <Link className="r-btn r-next-btn" href={`/dashboard/classes/${c.id}`}>{started ? "Finish the register" : "Take the register"}</Link>
+    </section>
+  );
+}
+
+/** Who to check on: students below the line and absences with no reason. Only shown when there is someone. */
+function NeedsAttention({ data, attention }) {
+  return (
         <section aria-labelledby="att">
           <div className="r-section-head">
-            <h2 id="att" className="r-h2">Needs attention {attention ? <span className="r-count">{attention}</span> : null}</h2>
+            <h2 id="att" className="r-h2">Who to check on <span className="r-count">{attention}</span></h2>
           </div>
           <div className="r-grid2">
-            <Panel title={`Below ${data.threshold}% this school year`}>
+            <Panel title={`Below ${data.threshold}% this year`}>
               {data.watch.length === 0 ? <p className="r-empty">Nobody is below {data.threshold}%. </p> : (
                 <ul className="r-list">
                   {data.watch.map((s) => (
@@ -212,30 +267,6 @@ function Today() {
             </Panel>
           </div>
         </section>
-
-        <section aria-labelledby="apps">
-          <div className="r-section-head">
-            <h2 id="apps" className="r-h2">Your apps</h2>
-            <button className="r-linkbtn" onClick={openMedia}><Music size={16} aria-hidden="true" /> Play music</button>
-          </div>
-          <TodayCrm />
-        </section>
-
-        <section aria-labelledby="nums">
-          <h2 id="nums" className="r-h2">At a glance</h2>
-          <div className="r-stats">
-            <div className="r-stat r-stat-key"><div className="r-stat-num">{pct(data.today.pct)}</div><div className="r-stat-label">In today ({data.today.marked} marked)</div></div>
-            <div className="r-stat"><div className="r-stat-num">{pct(data.week.pct)}</div><div className="r-stat-label">This week</div></div>
-            <div className="r-stat"><div className="r-stat-num">{pct(data.year.pct)}</div><div className="r-stat-label">School year so far</div></div>
-            <div className="r-stat"><div className="r-stat-num">{data.totals.students}</div><div className="r-stat-label">Students in {data.totals.classes} {data.totals.classes === 1 ? "class" : "classes"}</div></div>
-          </div>
-          <p style={{ marginTop: 12 }}><Link href="/dashboard/reports">See full reports</Link></p>
-        </section>
-      </div>
-      <Dialog open={adding} onClose={() => setAdding(false)} title="New class">
-        <NewClassForm onDone={(cls, n) => { toast.success(`${cls.name} created.`); router.push(`/dashboard/classes/${cls.id}${n ? "" : "?tab=students"}`); }} />
-      </Dialog>
-    </>
   );
 }
 

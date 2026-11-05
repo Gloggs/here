@@ -59,9 +59,9 @@ export default async function Home({ searchParams }) {
       {notice ? <p className="l-notice" role="status">{notice}</p> : null}
       <section className="l-hero">
         <svg className="l-hero-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-          <rect x="1" y="1" width="62" height="62" fill="none" stroke="#332D2A" strokeWidth="0.5" />
-          <path d="M38 12 L24 52" stroke="#3A3330" strokeWidth="7" strokeLinecap="square" />
-          <rect x="44" y="45" width="8" height="8" fill="#3F2A20" />
+          <rect x="1" y="1" width="62" height="62" fill="none" stroke="#0F3326" strokeWidth="0.5" />
+          <path d="M38 12 L24 52" stroke="#0F3326" strokeWidth="7" strokeLinecap="square" />
+          <rect x="44" y="45" width="8" height="8" fill="#0F3326" />
         </svg>
         <div className="l-hero-copy">
           <h1 className="l-h1">The class register that takes ten seconds.</h1>

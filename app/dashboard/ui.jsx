@@ -29,12 +29,14 @@ export function SandboxBar() {
       <span><b>Sandbox.</b> <span className="r-sandbox-long">{guest ? "A private demo with practice data. It is wiped after 24 hours." : "Practice data, kept apart from your real register."}</span><span className="r-sandbox-short">{guest ? "Demo data, wiped after 24 hours." : "Practice data only."}</span></span>
       <span className="r-row" style={{ gap: 8 }}>
         <button type="button" className="r-btn r-btn-sm" onClick={() => setTools(true)}>Sandbox tools</button>
-        {guest ? <a className="r-btn r-btn-ghost r-btn-sm" href={JOIN}>Create a free account</a>
+        {guest ? <a className="r-btn r-btn-ghost r-btn-sm r-sandbox-wide" href={JOIN}>Create a free account</a>
           : <button type="button" className="r-btn r-btn-ghost r-btn-sm r-sandbox-back" onClick={() => switchTo("main")}>Back to my register</button>}
-        {guest ? <a className="r-sandbox-end" href="/demo/end">End demo</a> : null}
+        {guest ? <a className="r-sandbox-end r-sandbox-wide" href="/demo/end">End demo</a> : null}
       </span>
       <Dialog open={tools} onClose={() => setTools(false)} title="Sandbox tools">
         <p className="r-muted" style={{ marginTop: 0 }}>Try things out here. None of this can reach your real classes.</p>
+        {/* On a phone the bar keeps one line, so the account and end-demo links live here instead */}
+        {guest ? <p className="r-row r-sandbox-narrow" style={{ gap: 12 }}><a className="r-btn r-btn-ghost r-btn-sm" href={JOIN}>Create a free account</a><a className="r-sandbox-end" href="/demo/end">End demo</a></p> : null}
         <SandboxTools onDone={() => setTools(false)} />
       </Dialog>
     </div>

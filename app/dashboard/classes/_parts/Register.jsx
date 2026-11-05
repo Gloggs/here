@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Check, X, List, LayoutGrid } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, List, LayoutGrid } from "lucide-react";
 import { api, qs, localIso, shiftIso, longDate, REASONS, REASON_CODES, REASON_LABELS, STATUS_CODES, markCode } from "@/lib/client";
 import { Loading, Avatar, Dialog } from "../../ui";
 
@@ -272,7 +272,7 @@ export default function Register({ className, classId, date, setDate, focusStude
             {doneAll ? (
               <>
                 <span className={`r-done${finish ? " is-fresh" : ""}`}>
-                  <Check size={18} aria-hidden="true" />
+                  <Stamp />
                   {finish ? `Register complete in ${finish.seconds < 60 ? `${finish.seconds} ${finish.seconds === 1 ? "second" : "seconds"}` : `${Math.floor(finish.seconds / 60)} min ${finish.seconds % 60} s`}` : `All ${counts.total} marked`}
                 </span>
                 {finish?.next ? <Link className="r-btn" href={`/dashboard/classes/${finish.next.id}`}>Next: {finish.next.name}</Link>
@@ -286,5 +286,15 @@ export default function Register({ className, classId, date, setDate, focusStude
         </>
       )}
     </div>
+  );
+}
+
+/** The Guild UK stamp: an octagon frame with a coral tick, shown only when a register is finished. */
+function Stamp() {
+  return (
+    <svg className="r-stamp" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7 1.5H17L22.5 7V17L17 22.5H7L1.5 17V7Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M7 12.5L10.5 16L17 8.5" fill="none" stroke="var(--coral)" strokeWidth="2.4" strokeLinecap="square" />
+    </svg>
   );
 }

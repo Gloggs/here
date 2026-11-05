@@ -13,7 +13,7 @@ function render(img, { x, y, zoom, rot }) {
   c.width = OUT; c.height = OUT;
   const g = c.getContext("2d");
   const scale = OUT / VIEW;
-  g.fillStyle = "#F7F1F0"; g.fillRect(0, 0, OUT, OUT);
+  g.fillStyle = "#FFFFFF"; g.fillRect(0, 0, OUT, OUT);
   g.translate(OUT / 2 + x * scale, OUT / 2 + y * scale);
   g.rotate((rot * Math.PI) / 180);
   const base = Math.max(VIEW / (rot % 180 ? img.height : img.width), VIEW / (rot % 180 ? img.width : img.height));

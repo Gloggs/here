@@ -54,7 +54,7 @@ export default function MediaDock() {
     try {
       const w = await window.documentPictureInPicture.requestWindow({ width: 420, height: embed.kind === "youtube" ? 260 : 152 });
       pip.current = w;
-      w.document.body.style.cssText = "margin:0;background:#262220";
+      w.document.body.style.cssText = "margin:0;background:#142019";
       const f = w.document.createElement("iframe");
       f.src = embed.src;
       f.allow = "autoplay; encrypted-media; fullscreen";
