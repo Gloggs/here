@@ -42,3 +42,11 @@ next-env.d.ts
 
 # keep the example settings file
 !.env.example
+
+# Playwright
+/test-results/
+/playwright-report/
+
+# Serwist (built from app/sw.js)
+public/sw*
+public/swe-worker*

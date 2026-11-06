@@ -2,9 +2,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Check, X, List, LayoutGrid } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, LayoutGrid } from "lucide-react";
 import { api, qs, localIso, shiftIso, longDate, REASONS, REASON_CODES, REASON_LABELS, STATUS_CODES, markCode } from "@/lib/client";
 import { Loading, Avatar, Dialog } from "../../ui";
+import { queue, pending } from "@/lib/outbox";
+
+const markKey = (studentId, date) => `mark:${studentId}:${date}`;
 
 const WORD = { present: "Present", late: "Late", absent: "Absent" };
 
@@ -22,17 +25,30 @@ export default function Register({ className, classId, date, setDate, focusStude
   const [finish, setFinish] = useState(null);
   const [error, setError] = useState("");
   const today = localIso();
-  const [tip, setTip] = useState(false);
-  useEffect(() => { try { setTip(!localStorage.getItem("register-tip-seen")); } catch { setTip(false); } }, []);
-  const hideTip = () => { setTip(false); try { localStorage.setItem("register-tip-seen", "1"); } catch {} };
 
   const load = useCallback(() => {
     setData(null); setError("");
-    api.get(`/api/attendance?${qs({ class: className, from: date, to: date })}`)
-      .then((d) => setData({ students: d.students, dayOff: d.daysOff[0] || null,
-        marks: Object.fromEntries(d.marks.map((m) => [m.studentId, m])) }))
-      .catch((e) => setError(e.message));
+    // With no signal the service worker answers from the copy saved the last time this register was opened,
+    // and marks still waiting on this phone are laid on top, so the screen always shows what you tapped.
+    Promise.all([api.get(`/api/attendance?${qs({ class: className, from: date, to: date })}`), pending()])
+      .then(([d, waiting]) => {
+        const marks = Object.fromEntries(d.marks.map((m) => [m.studentId, m]));
+        for (const w of waiting) {
+          if (!w.key.endsWith(`:${date}`)) continue;
+          const id = Number(w.key.split(":")[1]);
+          if (w.method === "DELETE") delete marks[id];
+          else marks[id] = { studentId: id, iso: date, ...w.body };
+        }
+        setData({ students: d.students, dayOff: d.daysOff[0] || null, marks });
+      })
+      .catch((e) => setError(e.offline ? "No signal, and this register has not been opened on this phone yet. It will load when you are back online." : e.message));
   }, [className, date]);
+  // When waiting marks are sent, show the server's copy again
+  useEffect(() => {
+    const onSent = () => pending().then((w) => { if (!w.length) load(); });
+    window.addEventListener("here:outbox-sent", onSent);
+    return () => window.removeEventListener("here:outbox-sent", onSent);
+  }, [load]);
   useEffect(() => { setOpen(focusStudent || null); setStarted(null); setFinish(null); load(); }, [load]); // eslint-disable-line react-hooks/exhaustive-deps
   // Arriving from "Add reason": open that student's row and bring it into view.
   useEffect(() => {
@@ -51,9 +67,12 @@ export default function Register({ className, classId, date, setDate, focusStude
     const next = { studentId, iso: date, status: "present", reason: null, note: null, ...before, ...change };
     if (next.status !== "absent") next.reason = null;
     setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: next } }));
+    const body = { studentId, date, status: next.status, reason: next.reason, note: next.note };
     try {
-      await api.post("/api/attendance", { studentId, date, status: next.status, reason: next.reason, note: next.note });
+      await api.post("/api/attendance", body);
     } catch (e) {
+      // No signal: keep the mark on screen and on this phone, and send it later
+      if (e.offline) { await queue({ key: markKey(studentId, date), method: "POST", url: "/api/attendance", body }); return; }
       toast.error(e.message);
       setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } }));
     }
@@ -62,13 +81,28 @@ export default function Register({ className, classId, date, setDate, focusStude
   async function clear(studentId) {
     const before = data.marks[studentId];
     setData((d) => { const marks = { ...d.marks }; delete marks[studentId]; return { ...d, marks }; });
-    try { await api.del(`/api/attendance?${qs({ studentId, date })}`); }
-    catch (e) { toast.error(e.message); setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } })); }
+    const url = `/api/attendance?${qs({ studentId, date })}`;
+    try { await api.del(url); }
+    catch (e) {
+      if (e.offline) { await queue({ key: markKey(studentId, date), method: "DELETE", url }); return; }
+      toast.error(e.message); setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } }));
+    }
   }
 
   async function markRest() {
     if (!started) setStarted(Date.now());
     const ids = data.students.filter((s) => !data.marks[s.id]).map((s) => s.id);
+    if (!navigator.onLine) {
+      // No signal: mark each one present on this phone, to send later
+      const marks = { ...data.marks };
+      for (const id of ids) {
+        const body = { studentId: id, date, status: "present", reason: null, note: null };
+        marks[id] = { ...body, iso: date };
+        await queue({ key: markKey(id, date), method: "POST", url: "/api/attendance", body });
+      }
+      setData((d) => ({ ...d, marks }));
+      return;
+    }
     try {
       const r = await api.post("/api/attendance/rest", { className, date });
       load();
@@ -113,7 +147,6 @@ export default function Register({ className, classId, date, setDate, focusStude
     if (!doneAll || !started || finish) return;
     const seconds = Math.max(1, Math.round((Date.now() - started) / 1000));
     setFinish({ seconds, next: null });
-    hideTip(); // they have done it once, so the tip has done its job
     api.get(`/api/overview?${qs({ date })}`).then((o) => {
       const next = o.classes.find((c) => c.name !== className && c.students > 0 && c.markedToday < c.students);
       setFinish({ seconds, next });
@@ -147,15 +180,6 @@ export default function Register({ className, classId, date, setDate, focusStude
             </div>
             <div className="r-bar r-bar-thick"><span style={{ width: `${pctDone}%` }} /></div>
           </div>
-          {tip ? (
-            <div className="r-tip" role="note">
-              <div>
-                <strong>How to take the register</strong>
-                <p>Tap <b>/</b> present, <b>L</b> late or <b>N</b> absent, the same marks as a paper register. Absent asks for a reason, which changes the N to its code. Tap a name to add a note. Every tap saves.</p>
-              </div>
-              <button className="r-icon-btn r-icon-bare" onClick={hideTip} aria-label="Hide this tip"><X size={18} /></button>
-            </div>
-          ) : null}
           {data.dayOff ? <p className="r-note">This is a day off ({data.dayOff.label}). Marks on this day are left out of percentages.</p> : null}
 
           <div className="r-viewbar">
@@ -272,7 +296,7 @@ export default function Register({ className, classId, date, setDate, focusStude
             {doneAll ? (
               <>
                 <span className={`r-done${finish ? " is-fresh" : ""}`}>
-                  <Check size={18} aria-hidden="true" />
+                  <Stamp />
                   {finish ? `Register complete in ${finish.seconds < 60 ? `${finish.seconds} ${finish.seconds === 1 ? "second" : "seconds"}` : `${Math.floor(finish.seconds / 60)} min ${finish.seconds % 60} s`}` : `All ${counts.total} marked`}
                 </span>
                 {finish?.next ? <Link className="r-btn" href={`/dashboard/classes/${finish.next.id}`}>Next: {finish.next.name}</Link>
@@ -286,5 +310,15 @@ export default function Register({ className, classId, date, setDate, focusStude
         </>
       )}
     </div>
+  );
+}
+
+/** The Guild UK stamp: an octagon frame with a coral tick, shown only when a register is finished. */
+function Stamp() {
+  return (
+    <svg className="r-stamp" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7 1.5H17L22.5 7V17L17 22.5H7L1.5 17V7Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M7 12.5L10.5 16L17 8.5" fill="none" stroke="var(--coral)" strokeWidth="2.4" strokeLinecap="square" />
+    </svg>
   );
 }

@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, smallint, boolean, text, index, uniqueIndex, timestamp, date } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, integer, smallint, boolean, text, index, uniqueIndex, timestamp, date, primaryKey } from 'drizzle-orm/pg-core';
 
 // Every table except the legacy ones carries owner_id (the Kinde user id), and
 // every query filters on it, so each account only ever sees its own records.
@@ -150,3 +150,10 @@ export const SETTINGS = pgTable('settings', {
   value: text('value'),
   updatedAt: varchar('updated_at', { length: 50 })
 });
+
+// One-time things an account has seen (the first-run guide). Only names from an allowlist are stored.
+export const USER_FLAGS = pgTable('user_flags', {
+  ownerId: varchar('owner_id', { length: 64 }).notNull(),
+  name: varchar('name', { length: 40 }).notNull(),
+  setAt: timestamp('set_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({ pk: primaryKey({ columns: [t.ownerId, t.name] }) }));

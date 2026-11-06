@@ -7,8 +7,8 @@ import { PageHead, useAccount } from "../ui";
 const LINKS = [
   { href: "/dashboard/students", label: "Students", hint: "Everyone in every class", icon: Users },
   { href: "/dashboard/apps", label: "Apps", hint: "Zoho CRM, WhatsApp, YouTube, Spotify", icon: Blocks },
-  { href: "/dashboard/settings", label: "Settings", hint: "Theme, sandbox, your data", icon: Settings },
-  { href: "/help", label: "Help", hint: "How it works and register codes", icon: CircleHelp },
+  { href: "/dashboard/settings", label: "Settings", hint: "Help, connected apps, theme, your data", icon: Settings },
+  { href: "/dashboard/settings#help", label: "Help", hint: "How to use here, and the guide again", icon: CircleHelp },
   { href: "/privacy", label: "Privacy", hint: "What is stored and why", icon: Shield },
 ];
 

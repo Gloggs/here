@@ -1,4 +1,6 @@
 "use client";
+import { toast } from "sonner";
+import { pending, flush, OUTBOX_EVENT } from "@/lib/outbox";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,12 +31,14 @@ export function SandboxBar() {
       <span><b>Sandbox.</b> <span className="r-sandbox-long">{guest ? "A private demo with practice data. It is wiped after 24 hours." : "Practice data, kept apart from your real register."}</span><span className="r-sandbox-short">{guest ? "Demo data, wiped after 24 hours." : "Practice data only."}</span></span>
       <span className="r-row" style={{ gap: 8 }}>
         <button type="button" className="r-btn r-btn-sm" onClick={() => setTools(true)}>Sandbox tools</button>
-        {guest ? <a className="r-btn r-btn-ghost r-btn-sm" href={JOIN}>Create a free account</a>
+        {guest ? <a className="r-btn r-btn-ghost r-btn-sm r-sandbox-wide" href={JOIN}>Create a free account</a>
           : <button type="button" className="r-btn r-btn-ghost r-btn-sm r-sandbox-back" onClick={() => switchTo("main")}>Back to my register</button>}
-        {guest ? <a className="r-sandbox-end" href="/demo/end">End demo</a> : null}
+        {guest ? <a className="r-sandbox-end r-sandbox-wide" href="/demo/end">End demo</a> : null}
       </span>
       <Dialog open={tools} onClose={() => setTools(false)} title="Sandbox tools">
         <p className="r-muted" style={{ marginTop: 0 }}>Try things out here. None of this can reach your real classes.</p>
+        {/* On a phone the bar keeps one line, so the account and end-demo links live here instead */}
+        {guest ? <p className="r-row r-sandbox-narrow" style={{ gap: 12 }}><a className="r-btn r-btn-ghost r-btn-sm" href={JOIN}>Create a free account</a><a className="r-sandbox-end" href="/demo/end">End demo</a></p> : null}
         <SandboxTools onDone={() => setTools(false)} />
       </Dialog>
     </div>
@@ -68,7 +72,7 @@ export function PageHead({ title, sub, back, lead, children }) {
   useEffect(() => { if (typeof title === "string") document.title = `${title} | Here.`; }, [title]);
   return (
     <header className="r-head">
-      {back ? <Link className={`r-back${back.phoneOnly ? " r-phone-only" : ""}`} href={back.href}>← {back.label}</Link> : null}
+      {back ? <Link className={`r-back${back.phoneOnly ? " r-phone-only" : ""}`} href={back.href}>Back to {back.label.toLowerCase()}</Link> : null}
       <div className="r-head-row">
         {lead ? <div className="r-head-lead">{lead}<h1 className="r-title">{title}</h1></div> : <h1 className="r-title">{title}</h1>}
         {children ? <div className="r-row">{children}</div> : null}
@@ -125,17 +129,33 @@ export function Loading({ rows = 5 }) {
 }
 
 /** A slim bar that appears when the device loses its connection. */
+/** Says plainly when there is no signal and how many marks are waiting on this phone, and sends them when it can. */
 export function OfflineBar() {
   const [offline, setOffline] = useState(false);
+  const [waiting, setWaiting] = useState(0);
   useEffect(() => {
-    const update = () => setOffline(!navigator.onLine);
-    update();
+    const count = () => pending().then((w) => setWaiting(w.length));
+    const send = async () => {
+      if (!navigator.onLine) return;
+      const before = (await pending()).length;
+      if (!before) return;
+      const r = await flush();
+      if (r.sent) { toast.success(`${r.sent} saved ${r.sent === 1 ? "mark" : "marks"} sent.`); window.dispatchEvent(new Event("here:outbox-sent")); }
+      if (r.failed) toast.error(`${r.failed} saved ${r.failed === 1 ? "mark" : "marks"} could not be sent and ${r.failed === 1 ? "was" : "were"} dropped. Please check that register.`);
+    };
+    const update = () => { setOffline(!navigator.onLine); if (navigator.onLine) send(); };
+    update(); count();
+    const timer = setInterval(send, 20000);
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
-    return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
+    window.addEventListener(OUTBOX_EVENT, count);
+    return () => { clearInterval(timer); window.removeEventListener("online", update); window.removeEventListener("offline", update); window.removeEventListener(OUTBOX_EVENT, count); };
   }, []);
-  if (!offline) return null;
-  return <div className="r-offline" role="status">You are offline. Marks will not save until the connection is back.</div>;
+  if (offline) {
+    return <div className="r-offline" role="status">No signal. {waiting ? `${waiting} ${waiting === 1 ? "mark is" : "marks are"} saved on this phone and will be sent` : "Marks you take are saved on this phone and sent"} when you are back online.</div>;
+  }
+  if (waiting) return <div className="r-offline is-sending" role="status">Sending {waiting} saved {waiting === 1 ? "mark" : "marks"}…</div>;
+  return null;
 }
 
 /** Splits pasted text into clean names: one per line, or comma separated. */

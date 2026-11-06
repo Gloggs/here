@@ -112,13 +112,13 @@ function Timer() {
 
 const TOOLS = [["pick", "Pick a name", Shuffle], ["groups", "Make groups", UsersRound], ["timer", "Timer", TimerIcon], ["media", "Media", Music]];
 
-export default function Toolkit({ cls }) {
+export default function Toolkit({ cls, trigger }) {
   const [open, setOpen] = useState(false);
   const [tool, setTool] = useState("pick");
   const here = useHere(cls, open);
   return (
     <>
-      <button className="r-btn r-btn-ghost" onClick={() => setOpen(true)}><Wrench size={18} aria-hidden="true" /> Tools</button>
+      {trigger ? trigger({ onOpen: () => setOpen(true) }) : <button className="r-btn r-btn-ghost" onClick={() => setOpen(true)}><Wrench size={18} aria-hidden="true" /> Tools</button>}
       <Dialog open={open} onClose={() => setOpen(false)} title={`Tools for ${cls.name}`}>
         <div className="r-seg r-seg-big r-seg-tools" role="tablist" aria-label="Tool" style={{ marginBottom: 16 }}>
           {TOOLS.map(([k, label, Icon]) => (

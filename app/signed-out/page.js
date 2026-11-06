@@ -1,10 +1,12 @@
 import Logo from "../_brand/Logo";
+import ClearDevice from "../_brand/ClearDevice";
 
 export const metadata = { title: "Signed out | Here." };
 
 export default function SignedOut() {
   return (
     <main style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <ClearDevice />
       <div className="r-panel" style={{ maxWidth: 420, width: "100%" }}>
         <div className="r-head"><Logo onDark height={32} /><h1 className="r-title" style={{ marginTop: 20 }}>Signed out</h1></div>
         <div className="r-panel-pad">

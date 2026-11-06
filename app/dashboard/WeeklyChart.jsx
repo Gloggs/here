@@ -52,7 +52,7 @@ export default function WeeklyChart({ weeks, threshold = 90, lineLabel = "persis
       </svg>
       <figcaption className="r-legend">
         <span><i style={{ background: "var(--ink)" }} />At or above {threshold}%</span>
-        <span><i style={{ background: "#A15C38" }} />Below {threshold}%</span>
+        <span><i style={{ background: "var(--alert)" }} />Below {threshold}%</span>
         <span><i className="r-legend-dash" />{threshold}% {lineLabel}</span>
       </figcaption>
       <table className="sr-only">

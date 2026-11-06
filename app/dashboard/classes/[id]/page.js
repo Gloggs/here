@@ -10,10 +10,13 @@ import ClassStudents from "../_parts/ClassStudents";
 import ClassSettings from "../_parts/ClassSettings";
 import Points from "../_parts/Points";
 import Tasks from "../_parts/Tasks";
-import Toolkit from "../_parts/Toolkit";
+import ClassTools from "../_parts/ClassTools";
 
-const CLASS_TABS = [["register", "Register"], ["points", "Points"], ["tasks", "Tasks"], ["month", "Month"], ["students", "Students"], ["settings", "Settings"]];
-const TEAM_TABS = [["tasks", "Tasks"], ["register", "Attendance"], ["points", "Points"], ["month", "Month"], ["students", "People"], ["settings", "Settings"]];
+// Progressive disclosure: the register and who is in the class stay on top; the extras live in Class tools.
+const CLASS_TABS = [["register", "Register"], ["month", "Month"], ["students", "Students"], ["tools", "Class tools"]];
+const TEAM_TABS = [["tasks", "Tasks"], ["register", "Attendance"], ["students", "People"], ["tools", "Team tools"]];
+// Old links (?tab=points and so on) still land in the right place
+const MOVED = { points: "points", tasks: "tasks", settings: "settings" };
 
 function ClassHub({ id }) {
   const router = useRouter();
@@ -27,8 +30,11 @@ function ClassHub({ id }) {
 
   const cls = classes?.find((c) => String(c.id) === String(id));
   const TABS = cls?.kind === "team" ? TEAM_TABS : CLASS_TABS;
-  const tab = TABS.some(([t]) => t === params.get("tab")) ? params.get("tab") : TABS[0][0];
-  const go = (next) => router.replace(`/dashboard/classes/${id}?${qs({ tab: next.tab ?? tab, date: (next.date ?? date) === localIso() ? undefined : next.date ?? date })}`, { scroll: false });
+  const asked = params.get("tab");
+  const moved = Object.hasOwn(MOVED, asked || "") && !TABS.some(([t]) => t === asked) ? MOVED[asked] : null;
+  const tab = moved ? "tools" : TABS.some(([t]) => t === asked) ? asked : TABS[0][0];
+  const tool = moved || params.get("tool") || null;
+  const go = (next) => router.replace(`/dashboard/classes/${id}?${qs({ tab: next.tab ?? tab, tool: next.tab && next.tab !== "tools" ? undefined : next.tool === undefined ? (tab === "tools" ? tool || undefined : undefined) : next.tool || undefined, date: (next.date ?? date) === localIso() ? undefined : next.date ?? date })}`, { scroll: false });
 
   if (error) return <><PageHead title="Class" /><div className="r-body"><p className="r-error">{error}</p></div></>;
   if (!classes) return <><PageHead title="Class" /><Loading /></>;
@@ -40,7 +46,6 @@ function ClassHub({ id }) {
   return (
     <>
       <PageHead title={cls.name} sub={`${cls.kind === "team" ? "Team. " : ""}${cls.students} ${cls.kind === "team" ? (cls.students === 1 ? "person" : "people") : cls.students === 1 ? "student" : "students"}`} back={{ href: "/dashboard/classes", label: "Classes" }}>
-        <Toolkit cls={cls} />
         {classes.length > 1 ? (
           <select className="r-select" style={{ width: "auto" }} aria-label="Switch class" value={cls.id}
             onChange={(e) => router.push(`/dashboard/classes/${e.target.value}?${qs({ tab })}`)}>
@@ -50,7 +55,7 @@ function ClassHub({ id }) {
       </PageHead>
       <nav className="r-tabs" aria-label="Class sections">
         {TABS.map(([t, label]) => (
-          <button key={t} aria-current={tab === t ? "page" : undefined} onClick={() => go({ tab: t })}>
+          <button key={t} aria-current={tab === t ? "page" : undefined} onClick={() => go({ tab: t, tool: null })}>
             {label}{t === "students" ? <span className="r-tab-count">{cls.students}</span> : null}
           </button>
         ))}
@@ -58,9 +63,14 @@ function ClassHub({ id }) {
       {tab === "register" ? <Register className={cls.name} classId={cls.id} date={date} setDate={(d) => go({ date: d })} focusStudent={Number(params.get("student")) || null} /> : null}
       {tab === "month" ? <MonthGrid className={cls.name} onPickDay={(d) => go({ tab: "register", date: d })} /> : null}
       {tab === "students" ? <ClassStudents className={cls.name} onChange={load} /> : null}
-      {tab === "settings" ? <ClassSettings key={`${cls.id}-${cls.kind}-${cls.goalPct}`} cls={cls} onRenamed={load} /> : null}
-      {tab === "points" ? <Points cls={cls} /> : null}
       {tab === "tasks" ? <Tasks classId={cls.id} className={cls.name} /> : null}
+      {tab === "tools" ? (
+        <ClassTools cls={cls} tool={tool} open={(t) => go({ tab: "tools", tool: t })}>
+          {tool === "points" ? <Points cls={cls} /> : null}
+          {tool === "tasks" && cls.kind !== "team" ? <Tasks classId={cls.id} className={cls.name} /> : null}
+          {tool === "settings" ? <ClassSettings key={`${cls.id}-${cls.kind}-${cls.goalPct}`} cls={cls} onRenamed={load} /> : null}
+        </ClassTools>
+      ) : null}
     </>
   );
 }

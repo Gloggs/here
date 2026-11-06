@@ -1,3 +1,5 @@
+import withSerwistInit from '@serwist/next';
+
 /** @type {import('next').NextConfig} */
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -44,4 +46,14 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Serwist builds app/sw.js into public/sw.js so the register works with no signal. Off in development.
+const withSerwist = withSerwistInit({
+  swSrc: 'app/sw.js',
+  swDest: 'public/sw.js',
+  additionalPrecacheEntries: [{ url: '/offline', revision: process.env.VERCEL_GIT_COMMIT_SHA || String(Date.now()) }],
+  disable: dev,
+  // The register sends its saved marks itself when the signal returns (app/dashboard/ui.jsx), so no page reload
+  reloadOnOnline: false,
+});
+
+export default withSerwist(nextConfig);

@@ -88,8 +88,8 @@ export default function MonthGrid({ className, onPickDay }) {
         </div>
         <div className="r-legend">
           <span><i style={{ background: "var(--ink)" }} />/ Present</span>
-          <span><i style={{ background: "#C3A6A0" }} />L Late</span>
-          <span><i style={{ background: "#A15C38" }} />Absent: I illness, M medical, H holiday, N no reason</span>
+          <span><i style={{ background: "var(--sage)", outline: "1px solid var(--line-strong)" }} />L Late</span>
+          <span><i style={{ background: "var(--alert)" }} />Absent: I illness, M medical, H holiday, N no reason</span>
           <span><i style={{ background: "var(--line)" }} />Day off</span>
         </div>
       </div>

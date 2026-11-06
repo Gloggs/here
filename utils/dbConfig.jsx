@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schema';
 
@@ -12,6 +12,9 @@ function getClient() {
     if (!databaseUrl) {
       throw new Error('DATABASE_URL is not set. Add it in Vercel (Settings > Environment Variables) or in .env.local.');
     }
+    // Local development and end-to-end tests can point the driver at a local stand-in for Neon's SQL endpoint
+    // (see docs/TESTING.md). Never set in production.
+    if (process.env.NEON_LOCAL_SQL_URL) neonConfig.fetchEndpoint = process.env.NEON_LOCAL_SQL_URL;
     client = drizzle(neon(databaseUrl), { schema });
   }
   return client;

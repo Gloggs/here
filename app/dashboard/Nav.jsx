@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, LayoutGrid, Users, FileText, Settings, Menu, Blocks, Music } from "lucide-react";
+import { Sun, LayoutGrid, Users, FileText, Settings, Menu } from "lucide-react";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
 import { useAccount } from "./ui";
 import { CommandButton } from "./Command";
-import { openMedia } from "./MediaDock";
 import { SpaceTabs } from "./Workspace";
 import Logo from "../_brand/Logo";
 
@@ -14,7 +13,6 @@ const ITEMS = [
   { href: "/dashboard/classes", label: "Classes", icon: LayoutGrid },
   { href: "/dashboard/students", label: "Students", icon: Users },
   { href: "/dashboard/reports", label: "Reports", icon: FileText },
-  { href: "/dashboard/apps", label: "Apps", icon: Blocks },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -35,11 +33,10 @@ export function SideNav() {
           <Icon size={18} aria-hidden="true" /> {label}
         </Link>
       ))}
-      <button type="button" className="r-side-item" onClick={openMedia}><Music size={18} aria-hidden="true" /> Music</button>
       <div className="r-side-foot">
         <p className="r-side-user">{guest ? "Demo, no account" : name || user?.email || "Signed in"}</p>
         <div className="r-row" style={{ gap: 16 }}>
-          <Link className="r-side-signout" href="/help">Help</Link>
+          <Link className="r-side-signout" href="/dashboard/settings#help">Help</Link>
           {guest ? <a className="r-side-signout" href="/demo/end">End demo</a>
             : <LogoutLink postLogoutRedirectURL="/signed-out" className="r-side-signout">Sign out</LogoutLink>}
         </div>
