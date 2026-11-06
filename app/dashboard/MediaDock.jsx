@@ -93,7 +93,7 @@ export default function MediaDock() {
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
         </div>
       ) : null}
-      {view !== "open" ? (
+      {view !== "open" && embed ? (
         <button className={`r-dock-btn${embed ? " is-playing" : ""}`} onClick={() => setView("open")} aria-label={embed ? "Show the media player" : "Open the media player"} data-tip={embed ? "Playing. Show player" : "Media player"}>
           <Music size={20} aria-hidden="true" />{embed ? <span className="r-dock-dot" aria-hidden="true" /> : null}
         </button>

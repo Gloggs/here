@@ -3,7 +3,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [stable-v2]
+    branches: [main]
 
 permissions:
   contents: read
@@ -16,5 +16,50 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # The tests cover the pure attendance maths and input checks, so they need no packages.
+      # The unit tests cover the pure attendance maths and input checks, so they need no packages.
       - run: npm test
+
+  e2e:
+    # A real browser against the built app and a throwaway Postgres (docs/TESTING.md):
+    # the one-time guide, the three-tap register budget, accessibility checks and no sideways scrolling,
+    # at phone and laptop sizes, in light and dark.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: main
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PG_URL: postgres://postgres:postgres@127.0.0.1:5432/main
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create the tables
+        run: for f in drizzle/*.sql; do psql "$PG_URL" -v ON_ERROR_STOP=1 -q -f "$f"; done
+      - name: Build
+        run: npm run build
+        env:
+          KINDE_ISSUER_URL: https://example.kinde.com
+          KINDE_CLIENT_ID: ci
+          KINDE_CLIENT_SECRET: ci-not-a-secret
+          KINDE_SITE_URL: http://localhost:3100
+          KINDE_POST_LOGIN_REDIRECT_URL: http://localhost:3100/dashboard
+          KINDE_POST_LOGOUT_REDIRECT_URL: http://localhost:3100
+          DATABASE_URL: postgres://postgres:postgres@db.local:5432/main
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

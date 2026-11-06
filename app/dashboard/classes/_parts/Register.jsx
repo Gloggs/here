@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, X, List, LayoutGrid } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, LayoutGrid } from "lucide-react";
 import { api, qs, localIso, shiftIso, longDate, REASONS, REASON_CODES, REASON_LABELS, STATUS_CODES, markCode } from "@/lib/client";
 import { Loading, Avatar, Dialog } from "../../ui";
 
@@ -22,9 +22,6 @@ export default function Register({ className, classId, date, setDate, focusStude
   const [finish, setFinish] = useState(null);
   const [error, setError] = useState("");
   const today = localIso();
-  const [tip, setTip] = useState(false);
-  useEffect(() => { try { setTip(!localStorage.getItem("register-tip-seen")); } catch { setTip(false); } }, []);
-  const hideTip = () => { setTip(false); try { localStorage.setItem("register-tip-seen", "1"); } catch {} };
 
   const load = useCallback(() => {
     setData(null); setError("");
@@ -113,7 +110,6 @@ export default function Register({ className, classId, date, setDate, focusStude
     if (!doneAll || !started || finish) return;
     const seconds = Math.max(1, Math.round((Date.now() - started) / 1000));
     setFinish({ seconds, next: null });
-    hideTip(); // they have done it once, so the tip has done its job
     api.get(`/api/overview?${qs({ date })}`).then((o) => {
       const next = o.classes.find((c) => c.name !== className && c.students > 0 && c.markedToday < c.students);
       setFinish({ seconds, next });
@@ -147,15 +143,6 @@ export default function Register({ className, classId, date, setDate, focusStude
             </div>
             <div className="r-bar r-bar-thick"><span style={{ width: `${pctDone}%` }} /></div>
           </div>
-          {tip ? (
-            <div className="r-tip" role="note">
-              <div>
-                <strong>How to take the register</strong>
-                <p>Tap <b>/</b> present, <b>L</b> late or <b>N</b> absent, the same marks as a paper register. Absent asks for a reason, which changes the N to its code. Tap a name to add a note. Every tap saves.</p>
-              </div>
-              <button className="r-icon-btn r-icon-bare" onClick={hideTip} aria-label="Hide this tip"><X size={18} /></button>
-            </div>
-          ) : null}
           {data.dayOff ? <p className="r-note">This is a day off ({data.dayOff.label}). Marks on this day are left out of percentages.</p> : null}
 
           <div className="r-viewbar">

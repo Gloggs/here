@@ -26,8 +26,9 @@ export function CommandButton({ dark = false, label = "Search or jump to" }) {
   const [mac, setMac] = useState(false);
   useEffect(() => setMac(isMac()), []);
   return (
-    <button type="button" className={`r-cmd-btn${dark ? " is-dark" : ""}`} onClick={openCommand} aria-label={`${label} (${mac ? "Cmd" : "Ctrl"} K)`}>
-      <Search size={16} aria-hidden="true" /><span className="r-grow">{label}</span><kbd>{mac ? "⌘" : "Ctrl"} K</kbd>
+    <button type="button" className={`r-cmd-btn${dark ? " is-dark" : ""}`} onClick={openCommand} aria-keyshortcuts={mac ? "Meta+K" : "Control+K"}>
+      {/* The spoken name is the visible word, so voice control users can say it (WCAG 2.5.3) */}
+      <Search size={16} aria-hidden="true" /><span className="r-grow">{label}</span><kbd aria-hidden="true">{mac ? "⌘" : "Ctrl"} K</kbd>
     </button>
   );
 }

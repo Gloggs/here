@@ -8,6 +8,7 @@ import { api } from "@/lib/client";
 import Link from "next/link";
 import { PageHead, Panel, ConfirmButton, useAccount } from "../ui";
 import { useSpace, SandboxTools } from "../Workspace";
+import { GUIDE_STEPS, openGuide } from "../Guide";
 
 export default function SettingsPage() {
   const { user, guest, sandbox, name } = useAccount();
@@ -67,6 +68,24 @@ export default function SettingsPage() {
         </Panel>
         )}
 
+        <section id="help" className="r-panel" aria-labelledby="help-title">
+          <div className="r-panel-head"><h2 id="help-title" className="r-panel-title">Help: how to use here</h2></div>
+          <div className="r-panel-pad">
+            <ol className="r-help-steps">
+              {GUIDE_STEPS.map((s) => <li key={s.title}><b>{s.title}.</b> {s.text}</li>)}
+            </ol>
+            <div className="r-row" style={{ gap: 16 }}>
+              <button type="button" className="r-btn" onClick={openGuide}>Show the guide again</button>
+              <Link href="/help">Register codes and keyboard shortcuts</Link>
+            </div>
+          </div>
+        </section>
+
+        <Panel title="Connected apps" pad>
+          <p className="r-muted" style={{ marginTop: 0 }}>Zoho CRM, WhatsApp and email messages to parents, YouTube and Spotify.</p>
+          <Link className="r-btn r-btn-ghost" href="/dashboard/apps">Open connected apps</Link>
+        </Panel>
+
         <Panel title="Appearance" pad>
           <div className="r-seg" role="group" aria-label="Theme">
             {[["light", "Light"], ["dark", "Dark"], ["system", "Match device"]].map(([id, label]) => (
@@ -102,16 +121,6 @@ export default function SettingsPage() {
           </div>
         </Panel>}
 
-        <Panel title="How it works" pad>
-          <ul className="r-muted" style={{ margin: 0, paddingLeft: 18, lineHeight: 1.8 }}>
-            <li>Take the register on any device. Each tap saves straight away.</li>
-            <li>Late counts as in. Absent asks for a reason so you can spot patterns.</li>
-            <li>Students below 90% are flagged. That is the line the DfE uses for persistent absence.</li>
-            <li>Add half terms and bank holidays as days off so they do not count.</li>
-            <li>Download a summary or every mark as a spreadsheet from Reports.</li>
-          </ul>
-          <p style={{ marginBottom: 0 }}><Link href="/help">Read the full help page</Link></p>
-        </Panel>
       </div>
     </>
   );

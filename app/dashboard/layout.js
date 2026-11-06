@@ -4,6 +4,7 @@ import { SideNav, BottomNav } from "./Nav";
 import { OfflineBar, SandboxBar } from "./ui";
 import { Workspace, SpaceTabs } from "./Workspace";
 import { TopbarSearch } from "./Command";
+import Guide from "./Guide";
 import Logo from "../_brand/Logo";
 import { getUserId } from "@/lib/auth";
 import { SPACE_COOKIE } from "@/lib/guest";
@@ -34,6 +35,7 @@ export default async function DashboardLayout({ children }) {
         <div className="r-main">
           <a className="r-skip" href="#main">Skip to content</a>
           <OfflineBar />
+          <Guide />
           <div className="r-topbar">
             <Link href="/dashboard" aria-label="Here. today"><Logo onDark height={28} /></Link>
             <SpaceTabs compact />
