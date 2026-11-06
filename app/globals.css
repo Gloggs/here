@@ -338,8 +338,8 @@
 .l-steps h3, .l-feature h3 { margin: 0 0 8px; font-size: 17px; }
 .l-steps p, .l-feature p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 15px; }
 .l-features { display: grid; gap: 12px; background: none; border: 0; }
-@media (min-width: 640px) { .l-features { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 960px) { .l-features { grid-template-columns: repeat(3, 1fr); } }
+/* Three plain rows, not a grid of icon cards */
+@media (min-width: 960px) { .l-feature { grid-template-columns: 16rem 1fr; align-items: baseline; } }
 .l-feature { background: var(--sage); padding: 24px; display: grid; gap: 10px; align-content: start; }
 .l-band { background: var(--field); color: var(--on-field); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding: 48px 20px; }
 @media (min-width: 900px) { .l-band { padding: 64px 48px; } }

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ClipboardCheck, TriangleAlert, CalendarDays, FileSpreadsheet, Smartphone, Lock } from "lucide-react";
 import DemoRegister from "./_landing/DemoRegister";
 import Logo from "./_brand/Logo";
 import { SiteFooter } from "./_landing/DocPage";
@@ -9,7 +8,7 @@ import ClearDevice from "./_brand/ClearDevice";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Here. | The class register that takes ten seconds",
-  description: "Take attendance on your phone, spot students slipping below 90% and export reports. Private to your account.",
+  description: "For Saturday schools, faith classes, tuition, youth groups and adult learning. Take the register on your phone, even with no signal, and see who to check on.",
 };
 
 // The demo needs no account: /demo makes a private guest with the sample class.
@@ -20,16 +19,13 @@ const JOIN = `/api/auth/register?post_login_redirect_url=${encodeURIComponent("/
 const STEPS = [
   ["Add your class", "Name it and paste the names straight from a spreadsheet. Thirty students take one paste."],
   ["Take the register", "Tap / present, L late or N absent, the same codes as a paper register. Pick a reason for absences, then mark everyone else present in one go."],
-  ["Spot patterns early", "Anyone under 90% is flagged, with the days of the week they miss most."],
+  ["See who to check on", "Anyone below 90%, or with an absence that has no reason, appears first thing on Today, with the days they miss most."],
 ];
 
 const FEATURES = [
-  [Smartphone, "Made for your phone", "Big buttons, one hand, saves as you tap. Works just as well on a laptop."],
-  [TriangleAlert, "Persistent absence flag", "Uses the 90% line schools work to, so you see who needs a conversation."],
-  [ClipboardCheck, "Reasons, not just ticks", "Illness, appointment or holiday, plus a note. Missing reasons are chased for you."],
-  [CalendarDays, "Month at a glance", "A grid of every mark this month. Tap any square to change it."],
-  [FileSpreadsheet, "Reports to hand over", "Class summaries or every mark as a spreadsheet, for any date range."],
-  [Lock, "Private by default", "Every account starts empty and nobody else can see your classes or marks."],
+  ["Works with no signal", "Marks are saved on your phone and sent when you are back online. Works just as well on a laptop."],
+  ["Who to check on", "Uses the 90% line schools work to, so you know who needs a conversation."],
+  ["Reports to hand over", "Class summaries or every mark as a spreadsheet, for any date range."],
 ];
 
 const NOTICES = {
@@ -62,7 +58,7 @@ export default async function Home({ searchParams }) {
       <section className="l-hero">
         <div className="l-hero-copy">
           <h1 className="l-h1">The class register that takes ten seconds.</h1>
-          <p className="l-lead">Take attendance on your phone, see who is slipping below 90% and hand over reports as a spreadsheet. Free to use, and private to your account.</p>
+          <p className="l-lead">For Saturday schools, faith classes, tuition, youth groups and adult learning. Take the register on your phone, even with no signal, and see who to check on. Free, and private to your account.</p>
           <div className="r-row l-ctas">
             {signedIn ? <Link className="r-btn r-btn-light l-cta" href="/dashboard">Open your register</Link> : (
               <>
@@ -95,9 +91,8 @@ export default async function Home({ searchParams }) {
         <section className="l-section">
           <h2 className="l-h2">Everything a register needs, nothing it does not</h2>
           <div className="l-features">
-            {FEATURES.map(([Icon, t, d]) => (
+            {FEATURES.map(([t, d]) => (
               <div key={t} className="l-feature">
-                <Icon size={22} aria-hidden="true" />
                 <h3>{t}</h3>
                 <p>{d}</p>
               </div>

@@ -1,6 +1,8 @@
 # Here.
 
-The class register that takes ten seconds. Teachers and tutors mark attendance on their phone, see who is slipping below 90% and hand over reports as a spreadsheet.
+The class register that takes ten seconds, for groups that run classes outside a school's own systems: Saturday and supplementary schools, faith classes, tuition, youth groups and adult learning. Take the register on your phone, even with no signal, and see who to check on.
+
+Britain has an estimated 3,000 to 5,000 supplementary schools (Ives and Wyvill, 2008), and there are no official records of them. Most keep registers on paper, where nobody notices a child drifting away until it is too late to help. here exists for them. The evidence, with sources, is in [`docs/RESEARCH.md`](docs/RESEARCH.md).
 
 **Live:** https://here.guilduk.com. Choose *Try it now* to open a private demo with a full sample class. No sign-up needed.
 
@@ -12,6 +14,9 @@ It began as my university dissertation project. I rebuilt it with private accoun
 
 | Area | Features |
 | --- | --- |
+| No signal | Marks are saved on the phone and sent when the signal returns. Signing out or ending the demo clears the device. |
+| First time | A four-step guide shows once, then help lives in Settings. |
+| Class tools | Points, tasks, name picker, groups, timer and music, one tap away. |
 | Today | A card for each class showing how many are marked, with one button to take or finish the register. A list of students below 90% and absences with no reason, each linking to the place to fix it. |
 | Register | Marks from a paper register: `/` present, `L` late, `N` absent. Absences take a reason (`I` illness, `M` medical, `H` holiday). Notes, "mark the rest present" with undo, earlier days, and keyboard shortcuts on a computer. Every tap saves. |
 | Month view | Every mark for the month in a grid. Tap a square to change it, point at it for details, or tap a date to open that day. |
@@ -33,6 +38,11 @@ It began as my university dissertation project. I rebuilt it with private accoun
 
 | Skill | Where to look |
 | --- | --- |
+| Offline-first web app | Service worker (Serwist), an IndexedDB outbox (idb), a clear rule when changes clash (`app/sw.js`, `lib/outbox.js`) |
+| End-to-end and accessibility testing | Playwright and axe on every pull request, at phone and laptop sizes, light and dark (`tests/e2e/`, `docs/TESTING.md`) |
+| Measured usability | A Keystroke-Level Model speed budget enforced by a test (`docs/DESIGN.md`) |
+| Design frameworks, written down | Jobs to be Done, progressive disclosure, Nielsen's heuristics, WCAG 2.2 AA (`docs/DESIGN.md`) |
+| Research | The problem, who it is for and what exists, with dated sources (`docs/RESEARCH.md`) |
 | Full-stack web development | Next.js App Router pages and route handlers, Postgres through Drizzle ORM (`app/`, `lib/`) |
 | Secure multi-user design | Session checks in middleware and in every route, data scoped to each account, signed guest sessions for the demo, a sandbox isolated by its own owner id, server-side validation, safe CSV export (`SECURITY.md`) |
 | Testing and CI | Unit tests for the attendance maths, input checks, guest sessions, encryption, OAuth state and CRM rules, run by GitHub Actions on every pull request (`tests/`, `.github/workflows/`) |
@@ -47,9 +57,9 @@ It began as my university dissertation project. I rebuilt it with private accoun
 
 ## Built with
 
-Next.js 14, React 18, Kinde, Neon Postgres, Drizzle ORM, plain CSS, Vercel and GitHub Actions.
+Next.js 14, React 18, Kinde, Neon Postgres, Drizzle ORM, Serwist, idb, Playwright, axe-core, plain CSS on the Guild Design kit, Vercel and GitHub Actions.
 
-Read `docs/ARCHITECTURE.md` for how the parts fit together and `docs/DECISIONS.md` for why.
+Read [`docs/RESEARCH.md`](docs/RESEARCH.md) for the problem and the evidence, [`docs/DESIGN.md`](docs/DESIGN.md) for the thinking behind every screen, `docs/ARCHITECTURE.md` for how the parts fit together, `docs/DECISIONS.md` for why, and [`docs/TESTING.md`](docs/TESTING.md) for the tests.
 
 ## Run it locally
 
