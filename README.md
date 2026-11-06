@@ -2,7 +2,7 @@
 
 The class register that takes ten seconds, for groups that run classes outside a school's own systems: Saturday and supplementary schools, faith classes, tuition, youth groups and adult learning. Take the register on your phone, even with no signal, and see who to check on.
 
-Britain has an estimated 3,000 to 5,000 supplementary schools (Ives and Wyvill, 2008), and there are no official records of them. Most keep registers on paper, where nobody notices a child drifting away until it is too late to help. here exists for them. The evidence, with sources, is in [`docs/RESEARCH.md`](docs/RESEARCH.md).
+Britain has an estimated 3,000 to 5,000 supplementary schools (Ives and Wyvill, 2008), and there are no official records of them. We expect most keep registers on paper, where nobody notices a child drifting away until it is too late to help. here exists for them. The evidence, with sources, is in [`docs/RESEARCH.md`](docs/RESEARCH.md).
 
 **Live:** https://here.guilduk.com. Choose *Try it now* to open a private demo with a full sample class. No sign-up needed.
 
