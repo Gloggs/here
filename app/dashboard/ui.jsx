@@ -1,4 +1,6 @@
 "use client";
+import { toast } from "sonner";
+import { pending, flush, OUTBOX_EVENT } from "@/lib/outbox";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -127,17 +129,33 @@ export function Loading({ rows = 5 }) {
 }
 
 /** A slim bar that appears when the device loses its connection. */
+/** Says plainly when there is no signal and how many marks are waiting on this phone, and sends them when it can. */
 export function OfflineBar() {
   const [offline, setOffline] = useState(false);
+  const [waiting, setWaiting] = useState(0);
   useEffect(() => {
-    const update = () => setOffline(!navigator.onLine);
-    update();
+    const count = () => pending().then((w) => setWaiting(w.length));
+    const send = async () => {
+      if (!navigator.onLine) return;
+      const before = (await pending()).length;
+      if (!before) return;
+      const r = await flush();
+      if (r.sent) { toast.success(`${r.sent} saved ${r.sent === 1 ? "mark" : "marks"} sent.`); window.dispatchEvent(new Event("here:outbox-sent")); }
+      if (r.failed) toast.error(`${r.failed} saved ${r.failed === 1 ? "mark" : "marks"} could not be sent and ${r.failed === 1 ? "was" : "were"} dropped. Please check that register.`);
+    };
+    const update = () => { setOffline(!navigator.onLine); if (navigator.onLine) send(); };
+    update(); count();
+    const timer = setInterval(send, 20000);
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
-    return () => { window.removeEventListener("online", update); window.removeEventListener("offline", update); };
+    window.addEventListener(OUTBOX_EVENT, count);
+    return () => { clearInterval(timer); window.removeEventListener("online", update); window.removeEventListener("offline", update); window.removeEventListener(OUTBOX_EVENT, count); };
   }, []);
-  if (!offline) return null;
-  return <div className="r-offline" role="status">You are offline. Marks will not save until the connection is back.</div>;
+  if (offline) {
+    return <div className="r-offline" role="status">No signal. {waiting ? `${waiting} ${waiting === 1 ? "mark is" : "marks are"} saved on this phone and will be sent` : "Marks you take are saved on this phone and sent"} when you are back online.</div>;
+  }
+  if (waiting) return <div className="r-offline is-sending" role="status">Sending {waiting} saved {waiting === 1 ? "mark" : "marks"}…</div>;
+  return null;
 }
 
 /** Splits pasted text into clean names: one per line, or comma separated. */

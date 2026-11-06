@@ -44,13 +44,42 @@ test("a register takes three taps from Today, and ends with the stamp", async ({
   const tap = async (locator) => { await locator.click(); taps += 1; };
 
   await tap(page.getByRole("link", { name: "Take the register" }));
-  await expect(page.getByText(/0 of 12 marked/)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Mark the other 12 present/ })).toBeVisible();
   await tap(page.getByRole("button", { name: "Late" }).first());
   await tap(page.getByRole("button", { name: /Mark the other 11 present/ }));
 
   await expect(page.getByText(/Register complete in/)).toBeVisible();
   await expect(page.locator(".r-stamp")).toBeVisible();
   expect(taps).toBeLessThanOrEqual(3);
+});
+
+// The hall has no signal: the register still works, keeps every mark on the phone, and sends them later.
+test("with no signal, marks are kept on the phone and sent when it returns", async ({ page, context }) => {
+  await startDemo(page);
+  await page.getByRole("link", { name: "Take the register" }).click();
+  await expect(page).toHaveURL(/\/dashboard\/classes\/\d+/);
+  const register = page.getByRole("navigation", { name: "Class sections" });
+  await expect(register).toBeVisible();
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.reload(); // now the service worker has a copy of this page and its register
+  await expect(page.getByRole("button", { name: /Mark the other 12 present/ })).toBeVisible();
+
+  await context.setOffline(true);
+  await expect(page.getByText(/No signal\./)).toBeVisible();
+  await page.getByRole("button", { name: "Late" }).first().click();
+  await page.getByRole("button", { name: /Mark the other 11 present/ }).click();
+  await expect(page.getByText(/Register complete in/)).toBeVisible();
+  await expect(page.getByText(/12 marks are saved on this phone/)).toBeVisible();
+
+  // Even a reload with no signal shows what was tapped
+  await page.reload();
+  await expect(page.getByText("Register complete", { exact: true })).toBeVisible();
+  await expect(page.getByText(/11 present · 1 late · 0 absent/)).toBeVisible();
+
+  await context.setOffline(false);
+  await expect(page.getByText(/12 saved marks sent/)).toBeVisible({ timeout: 30_000 });
+  await page.reload();
+  await expect(page.getByText(/11 present · 1 late · 0 absent/)).toBeVisible();
 });
 
 test("Today leads with the register, and the extras wait in Class tools", async ({ page }) => {

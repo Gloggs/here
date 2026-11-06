@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, List, LayoutGrid } from "lucide-react";
 import { api, qs, localIso, shiftIso, longDate, REASONS, REASON_CODES, REASON_LABELS, STATUS_CODES, markCode } from "@/lib/client";
 import { Loading, Avatar, Dialog } from "../../ui";
+import { queue, pending } from "@/lib/outbox";
+
+const markKey = (studentId, date) => `mark:${studentId}:${date}`;
 
 const WORD = { present: "Present", late: "Late", absent: "Absent" };
 
@@ -25,11 +28,27 @@ export default function Register({ className, classId, date, setDate, focusStude
 
   const load = useCallback(() => {
     setData(null); setError("");
-    api.get(`/api/attendance?${qs({ class: className, from: date, to: date })}`)
-      .then((d) => setData({ students: d.students, dayOff: d.daysOff[0] || null,
-        marks: Object.fromEntries(d.marks.map((m) => [m.studentId, m])) }))
-      .catch((e) => setError(e.message));
+    // With no signal the service worker answers from the copy saved the last time this register was opened,
+    // and marks still waiting on this phone are laid on top, so the screen always shows what you tapped.
+    Promise.all([api.get(`/api/attendance?${qs({ class: className, from: date, to: date })}`), pending()])
+      .then(([d, waiting]) => {
+        const marks = Object.fromEntries(d.marks.map((m) => [m.studentId, m]));
+        for (const w of waiting) {
+          if (!w.key.endsWith(`:${date}`)) continue;
+          const id = Number(w.key.split(":")[1]);
+          if (w.method === "DELETE") delete marks[id];
+          else marks[id] = { studentId: id, iso: date, ...w.body };
+        }
+        setData({ students: d.students, dayOff: d.daysOff[0] || null, marks });
+      })
+      .catch((e) => setError(e.offline ? "No signal, and this register has not been opened on this phone yet. It will load when you are back online." : e.message));
   }, [className, date]);
+  // When waiting marks are sent, show the server's copy again
+  useEffect(() => {
+    const onSent = () => pending().then((w) => { if (!w.length) load(); });
+    window.addEventListener("here:outbox-sent", onSent);
+    return () => window.removeEventListener("here:outbox-sent", onSent);
+  }, [load]);
   useEffect(() => { setOpen(focusStudent || null); setStarted(null); setFinish(null); load(); }, [load]); // eslint-disable-line react-hooks/exhaustive-deps
   // Arriving from "Add reason": open that student's row and bring it into view.
   useEffect(() => {
@@ -48,9 +67,12 @@ export default function Register({ className, classId, date, setDate, focusStude
     const next = { studentId, iso: date, status: "present", reason: null, note: null, ...before, ...change };
     if (next.status !== "absent") next.reason = null;
     setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: next } }));
+    const body = { studentId, date, status: next.status, reason: next.reason, note: next.note };
     try {
-      await api.post("/api/attendance", { studentId, date, status: next.status, reason: next.reason, note: next.note });
+      await api.post("/api/attendance", body);
     } catch (e) {
+      // No signal: keep the mark on screen and on this phone, and send it later
+      if (e.offline) { await queue({ key: markKey(studentId, date), method: "POST", url: "/api/attendance", body }); return; }
       toast.error(e.message);
       setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } }));
     }
@@ -59,13 +81,28 @@ export default function Register({ className, classId, date, setDate, focusStude
   async function clear(studentId) {
     const before = data.marks[studentId];
     setData((d) => { const marks = { ...d.marks }; delete marks[studentId]; return { ...d, marks }; });
-    try { await api.del(`/api/attendance?${qs({ studentId, date })}`); }
-    catch (e) { toast.error(e.message); setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } })); }
+    const url = `/api/attendance?${qs({ studentId, date })}`;
+    try { await api.del(url); }
+    catch (e) {
+      if (e.offline) { await queue({ key: markKey(studentId, date), method: "DELETE", url }); return; }
+      toast.error(e.message); setData((d) => ({ ...d, marks: { ...d.marks, [studentId]: before } }));
+    }
   }
 
   async function markRest() {
     if (!started) setStarted(Date.now());
     const ids = data.students.filter((s) => !data.marks[s.id]).map((s) => s.id);
+    if (!navigator.onLine) {
+      // No signal: mark each one present on this phone, to send later
+      const marks = { ...data.marks };
+      for (const id of ids) {
+        const body = { studentId: id, date, status: "present", reason: null, note: null };
+        marks[id] = { ...body, iso: date };
+        await queue({ key: markKey(id, date), method: "POST", url: "/api/attendance", body });
+      }
+      setData((d) => ({ ...d, marks }));
+      return;
+    }
     try {
       const r = await api.post("/api/attendance/rest", { className, date });
       load();

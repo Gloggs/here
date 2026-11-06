@@ -383,7 +383,7 @@
 @media (min-width: 900px) { .r-skeleton { padding: 32px 40px; } }
 .r-skel-row { height: 44px; background: var(--line); animation: r-pulse 1.2s ease-in-out infinite alternate; }
 @keyframes r-pulse { from { opacity: .55; } to { opacity: 1; } }
-.r-offline { position: sticky; top: 0; z-index: 50; padding: 10px 16px; background: var(--alert); color: var(--on-alert); font-size: 14px; font-weight: 600; text-align: center; }
+.r-offline { position: sticky; top: 0; z-index: 50; padding: 10px 16px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 600; text-align: center; }
 .r-skip { position: absolute; left: 8px; top: -60px; z-index: 100; padding: 10px 14px; background: var(--ink); color: var(--paper); font-weight: 600; }
 .r-skip:focus { top: 8px; }
 #main:focus { outline: none; }
@@ -717,3 +717,4 @@ button.r-row-link { background: none; border: 0; font: inherit; text-align: left
 
 /* Finished register on a phone: the message on one line, the next step as a full-width button below */
 @media (max-width: 599px) { .r-sticky-foot { flex-wrap: wrap; } .r-sticky-foot .r-done { flex: 1 1 100%; } .r-sticky-foot > .r-btn { flex: 1 1 100%; } }
+.r-offline.is-sending { background: var(--sage); color: var(--ink); }

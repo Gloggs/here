@@ -4,6 +4,7 @@ import { ClipboardCheck, TriangleAlert, CalendarDays, FileSpreadsheet, Smartphon
 import DemoRegister from "./_landing/DemoRegister";
 import Logo from "./_brand/Logo";
 import { SiteFooter } from "./_landing/DocPage";
+import ClearDevice from "./_brand/ClearDevice";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -57,6 +58,7 @@ export default async function Home({ searchParams }) {
       </header>
 
       {notice ? <p className="l-notice" role="status">{notice}</p> : null}
+      {searchParams?.demo === "ended" ? <ClearDevice /> : null}
       <section className="l-hero">
         <div className="l-hero-copy">
           <h1 className="l-h1">The class register that takes ten seconds.</h1>
