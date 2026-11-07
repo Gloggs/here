@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "npx drizzle-kit push:pg",
     "db:studio": "npx drizzle-kit studio",
     "test": "node --test tests/*.test.mjs",
     "test:e2e": "playwright test",
