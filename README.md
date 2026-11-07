@@ -63,13 +63,30 @@ Read [`docs/RESEARCH.md`](docs/RESEARCH.md) for the problem and the evidence, [`
 
 ## Run it locally
 
-1. Install Node.js 20 or newer.
-2. Create a free Kinde app and a free Neon database.
+This repository holds no data and no keys. Your copy starts empty and uses your own accounts.
+
+1. Install Node.js 20 or newer, then get the code:
+
+   ```bash
+   git clone https://github.com/Gloggs/here.git
+   cd here
+   npm install
+   cp .env.example .env.local
+   ```
+
+2. Create a free Kinde app and a free Neon database (any Postgres 15 or newer works).
 3. In Kinde, add `http://localhost:3000/api/auth/kinde_callback` to the allowed callback URLs and `http://localhost:3000/signed-out` to the allowed logout URLs.
-4. Copy `.env.example` to `.env.local` and fill in your values.
-5. Run the SQL files in `drizzle/` in order in the Neon SQL editor.
+4. Fill in `.env.local`: the database connection string and the Kinde values are required, everything else is optional.
+5. Create the tables in the empty database by running the SQL files in `drizzle/` in order: paste each one into the Neon SQL editor, or, with `psql` installed, run this (the same loop the tests use):
+
+   ```bash
+   for f in drizzle/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f "$f"; done
+   ```
+
 6. Optional, for Zoho: register a server-based client at api-console.zoho.eu with the redirect URL `http://localhost:3000/api/connect/zoho/callback`, and put its Client ID and Secret in `.env.local` with a `CONNECTIONS_KEY` (`openssl rand -base64 32`).
-7. Run `npm install`, then `npm run dev`, then open http://localhost:3000.
+7. Run `npm run dev`, then open http://localhost:3000.
+
+Secrets only ever go in `.env.local` or your host's settings. `.gitignore` keeps every `.env` file except the example out of git.
 
 ## Tests
 

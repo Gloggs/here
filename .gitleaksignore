@@ -1,0 +1,2 @@
+# A dummy test value in the Playwright settings (GUEST_SECRET for the browser tests), not a real secret.
+b394905552207b68c2521c1a27ffce0765b1ea0b:playwright.config.mjs:generic-api-key:10

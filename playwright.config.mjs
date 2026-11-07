@@ -7,7 +7,7 @@ const env = {
   NEON_LOCAL_SQL_URL: "http://127.0.0.1:4445/sql",
   KINDE_CLIENT_ID: "e2e", KINDE_CLIENT_SECRET: "e2e-not-a-secret", KINDE_ISSUER_URL: "https://example.kinde.com",
   KINDE_SITE_URL: `http://localhost:${PORT}`, KINDE_POST_LOGIN_REDIRECT_URL: `http://localhost:${PORT}/dashboard`,
-  KINDE_POST_LOGOUT_REDIRECT_URL: `http://localhost:${PORT}`, GUEST_SECRET: "e2e-guest-secret-0123456789abcdef0123456789",
+  KINDE_POST_LOGOUT_REDIRECT_URL: `http://localhost:${PORT}`, GUEST_SECRET: "e2e-guest-secret-0123456789abcdef0123456789", // gitleaks:allow (dummy value for the browser tests)
 };
 
 export default defineConfig({
